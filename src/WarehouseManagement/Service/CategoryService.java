@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface CategoryService {
-    List<Category> searchCategoryByName(String name, List<Category> categories);
-    Map<String,Integer> synthesizeCategoryByProductQuantity(List<Category> categories, List<Product> products);
+    List<Category> searchCategoryByName(String name);
+    Map<String,Integer> synthesizeCategoryByProductQuantity(List<Product> products);
 }

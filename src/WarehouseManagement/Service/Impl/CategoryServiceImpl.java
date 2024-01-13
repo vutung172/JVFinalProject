@@ -8,15 +8,16 @@ import WarehouseManagement.entity.Product;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class CategoryServiceImpl implements BaseService<Category>, CategoryService {
     //Singleton cho class CategoryService
-    private static CategoryService categoryServiceInstance;
+    private static CategoryServiceImpl categoryServiceInstance;
 
     private CategoryServiceImpl() {
     }
 
-    public static CategoryService getCategoryServiceInstance(){
+    public static CategoryServiceImpl getCategoryServiceInstance(){
         if (categoryServiceInstance == null){
             categoryServiceInstance = new CategoryServiceImpl();
         }
@@ -33,27 +34,27 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
     }
 
     @Override
-    public void add(Category object, List<Category> list) {
+    public void add(Category object) {
 
     }
 
     @Override
-    public void update(Category oldObject, Category newObject) {
+    public void update(Scanner sc, Category updateCategory) {
 
     }
 
     @Override
-    public void delete(Category object, List<Category> list) {
+    public void delete(Category object) {
 
     }
 
     @Override
-    public List<Category> searchCategoryByName(String name, List<Category> categories) {
+    public List<Category> searchCategoryByName(String name) {
         return null;
     }
 
     @Override
-    public Map<String, Integer> synthesizeCategoryByProductQuantity(List<Category> categories, List<Product> products) {
+    public Map<String, Integer> synthesizeCategoryByProductQuantity(List<Product> products) {
         return null;
     }
 }
