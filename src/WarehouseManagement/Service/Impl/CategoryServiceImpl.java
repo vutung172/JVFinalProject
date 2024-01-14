@@ -21,8 +21,9 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
     private CategoryServiceImpl() {
     }
-    public static CategoryServiceImpl getCategoryServiceInstance(){
-        if (categoryServiceInstance == null){
+
+    public static CategoryServiceImpl getCategoryServiceInstance() {
+        if (categoryServiceInstance == null) {
             categoryServiceInstance = new CategoryServiceImpl();
         }
         return categoryServiceInstance;
@@ -30,9 +31,10 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
 
     //Singleton cho danh sách category
-    private static List<Category> categories = categoryIOServiceImpl.readFromFile(getCategoryServiceInstance().getPath()) ;
-    public static List<Category> getCategories(){
-        if (categories == null){
+    private static List<Category> categories = categoryIOServiceImpl.readFromFile(getCategoryServiceInstance().getPath());
+
+    public static List<Category> getCategories() {
+        if (categories == null) {
             categories = new ArrayList<>();
         }
         return categories;
@@ -40,18 +42,18 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
     @Override
     public void add(Category category) {
-        if (searchCategoryById(category.getId()) != null){
-            System.out.printf("Danh mục %s đã tồn tại, không thể thêm",category.getName());
+        if (searchCategoryById(category.getId()) != null) {
+            System.out.printf("Danh mục %s đã tồn tại, không thể thêm", category.getName());
         } else {
             categories.add(category);
-            categoryIOServiceImpl.writeToFile(categories,path);
+            categoryIOServiceImpl.writeToFile(categories, path);
         }
     }
 
     @Override
     public void update(Scanner sc, Category updateCategory) {
-        if (searchCategoryById(updateCategory.getId()) == null){
-            System.out.printf("Danh mục %s không tồn tại, mời nhập lại",updateCategory.getName());
+        if (searchCategoryById(updateCategory.getId()) == null) {
+            System.out.printf("Danh mục %s không tồn tại, mời nhập lại", updateCategory.getName());
         } else {
             do {
                 System.out.println("===== CẬP NHẬT DANH MỤC =====");
@@ -95,7 +97,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
                 } finally {
-                    categoryIOServiceImpl.writeToFile(categories,path);
+                    categoryIOServiceImpl.writeToFile(categories, path);
                 }
             } while (true);
         }
@@ -103,29 +105,33 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
     @Override
     public void delete(Category category) {
-        if (searchCategoryById(category.getId()) == null){
-            System.out.printf("Danh mục %s không tồn tại, không thể xóa",category.getName());
+        List<Product> products = ProductServiceImpl.getProducts();
+        long count = products.stream().filter(p -> p.getCategoryId() == category.getId()).count();
+        if (searchCategoryById(category.getId()) == null) {
+            System.out.printf("Danh mục %s không tồn tại, không thể xóa", category.getName());
+        } else if (count > 0) {
+            System.out.printf("Danh mục %s đã có %s sản phẩm, không thể xóa", category.getName(), count);
         } else {
             categories.remove(category);
-            System.out.printf("Xóa danh mục %s thành công",category.getName());
+            System.out.printf("Xóa danh mục %s thành công", category.getName());
         }
-        categoryIOServiceImpl.writeToFile(categories,path);
+        categoryIOServiceImpl.writeToFile(categories, path);
     }
 
     @Override
     public List<Category> searchCategoryByName(String name) {
         return categories.stream().filter(c -> c.getName().toLowerCase().contains(name.toLowerCase()))
-                                    .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
     public Map<String, Long> synthesizeCategoryByProductQuantity(List<Product> products) {
         Map<Integer, Long> productCountByCategory = products.stream()
                 .collect(Collectors.groupingBy(Product::getCategoryId, Collectors.counting()));
-        return categories.stream().collect(Collectors.toMap(Category::getName,c -> productCountByCategory.getOrDefault(c.getId(),0L)));
+        return categories.stream().collect(Collectors.toMap(Category::getName, c -> productCountByCategory.getOrDefault(c.getId(), 0L)));
     }
 
-    public Category searchCategoryById(int id){
+    public Category searchCategoryById(int id) {
         return categories.stream().filter(c -> c.getId() == id).findFirst().orElse(null);
     }
 }
