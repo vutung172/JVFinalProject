@@ -1,15 +1,18 @@
 package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
-import WarehouseManagement.Service.CategoryService;
 import WarehouseManagement.Service.ProductService;
-import WarehouseManagement.entity.Category;
 import WarehouseManagement.entity.Product;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProductServiceImpl implements BaseService<Product>, ProductService {
+    private static IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
+    private final String path = "products.txt";
+
+    public String getPath() {
+        return path;
+    }
     //Singleton cho class CategoryService
     private static ProductServiceImpl productServiceInstance;
 
@@ -24,7 +27,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     }
 
     //Singleton cho danh sách category
-    private static List<Product> products;
+    private static List<Product> products = productIOServiceImpl.readFromFile(getProductServiceInstance().getPath());
 
     public static List<Product> getProducts() {
         if (products == null) {
@@ -40,6 +43,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.add(product);
             System.out.println("Thêm sản pẩm thành công");
+            productIOServiceImpl.writeToFile(products,this.path);
         }
     }
 
@@ -108,6 +112,8 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                     System.err.println("Lựa chọn phải là số nguyên từ 1 đến 7");
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
+                } finally {
+                    productIOServiceImpl.writeToFile(products,this.path);
                 }
             } while (true);
         }
@@ -120,6 +126,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.remove(product);
             System.out.printf("Xóa sản phẩm %s thành công.\n", product.getName());
+            productIOServiceImpl.writeToFile(products,this.path);
         }
     }
 

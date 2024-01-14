@@ -1,6 +1,6 @@
 package WarehouseManagement.Main;
 
-import WarehouseManagement.Enum.SortType;
+import WarehouseManagement.Service.Impl.IOServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.Product;
 
@@ -9,8 +9,10 @@ import java.util.Scanner;
 
 public class ProductManagement {
     private static ProductServiceImpl productService = ProductServiceImpl.getProductServiceInstance();
+    private static IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
     public static void displayMenu(Scanner sc){
         do {
+            System.out.print("\u001B[1;35m");
             System.out.println("===== QUẢN LÝ SẢN PHẨM =====");
             System.out.println("1. Thêm mới sản phẩm");
             System.out.println("2. Cập nhật sản phẩm");
@@ -23,6 +25,7 @@ public class ProductManagement {
             try {
                 int choice = Integer.parseInt(sc.nextLine());
                 if (choice == 7){
+                    productIOServiceImpl.writeToFile(ProductServiceImpl.getProducts(),productService.getPath());
                     break;
                 } else {
                     menuSelection(sc,choice);
@@ -33,6 +36,7 @@ public class ProductManagement {
         } while (true);
     }
     public static void menuSelection(Scanner sc,int choice){
+        System.out.print("\u001B[32m");
         switch (choice){
             case 1:
                 String selection;
@@ -77,7 +81,7 @@ public class ProductManagement {
                 productService.displaySortedDataByName("ASC");
                 break;
             case 5:
-                productService.displaySortedDataByProfit("ASC");
+                productService.displaySortedDataByProfit("DESC");
                 break;
             case 6:
                 do {

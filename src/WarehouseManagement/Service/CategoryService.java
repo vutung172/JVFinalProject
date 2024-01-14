@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface CategoryService {
     List<Category> searchCategoryByName(String name);
-    Map<String,Integer> synthesizeCategoryByProductQuantity(List<Product> products);
+    Map<String,Long> synthesizeCategoryByProductQuantity(List<Product> products);
 }

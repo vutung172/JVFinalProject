@@ -2,11 +2,12 @@ package WarehouseManagement.entity;
 
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 
+import java.io.Serializable;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Category implements ICategory{
+public class Category implements ICategory, Serializable {
     private int id;
     private String name;
     private String description;
@@ -80,16 +81,11 @@ public class Category implements ICategory{
 
     //Phương thức của đối tượng Category
     @Override
-    public void inputData(Scanner sc) throws Exception{
-        String confirmContinuous;
-        do {
-            inputId(sc);
-            inputName(sc);
-            inputCategoryDescription(sc);
-            inputStatus(sc);
-            System.out.print("Bạn có muốn tiếp tục (Y/N): ");
-            confirmContinuous = sc.nextLine();
-        } while (confirmContinuous.equalsIgnoreCase("Y"));
+    public void inputData(Scanner sc){
+        inputId(sc);
+        inputName(sc);
+        inputCategoryDescription(sc);
+        inputStatus(sc);
     }
     public void inputId(Scanner sc){
         do {

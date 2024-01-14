@@ -3,14 +3,15 @@ package WarehouseManagement.entity;
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Product implements IProduct {
+public class Product implements IProduct, Serializable {
     private String id;
     private String name;
     private double importPrice;
@@ -256,8 +257,9 @@ public class Product implements IProduct {
                 if (categories.isEmpty()) {
                     System.err.println("Danh sách danh mục hiện đang trống, không thể chọn");
                 } else {
-                    categories.stream().forEach(category -> System.out.printf("%s. %s\n", category.getId(), category.getName()));
-                    System.out.print("Nhập vào ID của category muốn thêm: ");
+                    System.out.printf("%s | %s\n","Mã","Tên danh mục");
+                    categories.stream().sorted(Comparator.comparing(Category::getId)).forEach(category -> System.out.printf("%s | %s\n", category.getId(), category.getName()));
+                    System.out.print("Nhập vào mã của danh mục muốn thêm: ");
                     int idCategory = Integer.parseInt(sc.nextLine());
                     setCategoryId(idCategory);
                 }
