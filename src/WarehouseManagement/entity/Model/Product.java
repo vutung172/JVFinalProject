@@ -1,5 +1,6 @@
 package WarehouseManagement.entity.Model;
 
+import WarehouseManagement.Exception.ProductException;
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.FontConfig.PrintForm;
@@ -42,11 +43,11 @@ public class Product implements IProduct, Serializable {
         return id;
     }
 
-    public void setId(String id) throws Exception {
+    public void setId(String id) throws ProductException {
         if (!isValid(id, "P.{3}")) {
-            throw new Exception("ID phải gồm 4 kí tự, và bắt đầu là P");
+            throw new ProductException("ID phải gồm 4 kí tự, và bắt đầu là P");
         } else if (isExisted(product -> product.getId().equals(id))) {
-            throw new Exception("ID đã tồn tại");
+            throw new ProductException("ID đã tồn tại");
         } else {
             this.id = id;
         }
@@ -56,11 +57,11 @@ public class Product implements IProduct, Serializable {
         return name;
     }
 
-    public void setName(String name) throws Exception {
+    public void setName(String name) throws ProductException {
         if (!isValid(name, ".{6,30}")) {
-            throw new Exception("Tên sản phẩm phải từ 6 đến 30 kí tự");
+            throw new ProductException("Tên sản phẩm phải từ 6 đến 30 kí tự");
         } else if (isExisted(p -> p.getName().equals(name))) {
-            throw new Exception("Tên sản phẩm đã tồn tại");
+            throw new ProductException("Tên sản phẩm đã tồn tại");
         } else {
             this.name = name;
         }
@@ -70,12 +71,12 @@ public class Product implements IProduct, Serializable {
         return importPrice;
     }
 
-    public void setImportPrice(double importPrice) throws Exception {
+    public void setImportPrice(double importPrice) throws ProductException {
         if (importPrice <= 0) {
-            throw new Exception("Giá nhập phải lớn hơn 0");
+            throw new ProductException("Giá nhập phải lớn hơn 0");
         } else if (this.exportPrice != 0) {
             if (importPrice > (this.exportPrice / (1 + MIN_INTEREST_RATE))) {
-                throw new Exception("Giá nhập phải nhỏ hơn: " + (this.exportPrice / (1 + MIN_INTEREST_RATE)) + " USD.");
+                throw new ProductException("Giá nhập phải nhỏ hơn: " + (this.exportPrice / (1 + MIN_INTEREST_RATE)) + " USD.");
             } else {
                 this.importPrice = importPrice;
                 calProfit();
@@ -90,11 +91,11 @@ public class Product implements IProduct, Serializable {
         return exportPrice;
     }
 
-    public void setExportPrice(double exportPrice) throws Exception {
+    public void setExportPrice(double exportPrice) throws ProductException {
         if (exportPrice <= 0) {
-            throw new Exception("Giá bán phải lớn hơn không");
+            throw new ProductException("Giá bán phải lớn hơn không");
         } else if (exportPrice <= (this.importPrice * (1 + MIN_INTEREST_RATE))) {
-            throw new Exception("Giá bán phải lớn hơn: " + (this.importPrice * (1 + MIN_INTEREST_RATE)) + " USD.");
+            throw new ProductException("Giá bán phải lớn hơn: " + (this.importPrice * (1 + MIN_INTEREST_RATE)) + " USD.");
         } else {
             this.exportPrice = exportPrice;
             calProfit();
@@ -113,9 +114,9 @@ public class Product implements IProduct, Serializable {
         return description;
     }
 
-    public void setDescription(String description) throws Exception {
+    public void setDescription(String description) throws ProductException {
         if (description.trim().isEmpty()) {
-            throw new Exception("Yêu cầu phải nhập mô tả cho sản phẩm");
+            throw new ProductException("Yêu cầu phải nhập mô tả cho sản phẩm");
         } else {
             this.description = description;
         }
@@ -133,11 +134,20 @@ public class Product implements IProduct, Serializable {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(int categoryId) throws ProductException{
+        List<Category> categories = CategoryServiceImpl.getCategories();
+        Category category = categories.stream().filter(c -> c.getId() == categoryId)
+                                                    .findFirst()
+                                                    .orElse(null);
+        if (category == null){
+            throw  new ProductException("Danh mục không tồn tại");
+        } else if (!category.isStatus()) {
+            throw new ProductException("Danh mục hiện tạm dừng, không thể thêm");
+        } else {
+            this.categoryId = categoryId;
+        }
     }
 
-    //Color Font
 
     // Phương thức của đối tượng Product
     @Override
@@ -159,8 +169,8 @@ public class Product implements IProduct, Serializable {
                 String idProduct = sc.nextLine();
                 setId(idProduct);
                 break;
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
 
@@ -173,8 +183,8 @@ public class Product implements IProduct, Serializable {
                 String productNameInput = sc.nextLine();
                 setName(productNameInput);
                 break;
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
     }
@@ -188,8 +198,8 @@ public class Product implements IProduct, Serializable {
                 break;
             } catch (NumberFormatException nfe) {
                 PrintForm.warning(nfe.getMessage());
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
     }
@@ -203,8 +213,8 @@ public class Product implements IProduct, Serializable {
                 break;
             } catch (NumberFormatException nfe) {
                 PrintForm.warning(nfe.getMessage());
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
     }
@@ -216,8 +226,8 @@ public class Product implements IProduct, Serializable {
                 String productDescription = sc.nextLine();
                 setDescription(productDescription);
                 break;
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
     }
@@ -241,8 +251,6 @@ public class Product implements IProduct, Serializable {
                 }
             } catch (NumberFormatException nfe) {
                 PrintForm.warning(nfe.getMessage());
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
             }
         } while (true);
     }
@@ -253,11 +261,12 @@ public class Product implements IProduct, Serializable {
             try {
                 if (categories.isEmpty()) {
                     PrintForm.warning("Hiện chưa có danh mục nào trong danh sách, không thể chọn");
-                    setCategoryId(0);
                 } else {
-                    PrintForm.printTableF("%5s | %-30s\n", "Mã", "Tên danh mục");
-                    PrintForm.printTableF("%5s | %-30s\n", "0", "Chưa có danh mục");
-                    categories.stream().sorted(Comparator.comparing(Category::getId)).forEach(category -> PrintForm.printTableF("%5s | %-30s\n", category.getId(), category.getName()));
+                    PrintForm.tableF("%5s | %-30s\n", "Mã", "Tên danh mục");
+                    categories.stream().sorted(Comparator.comparing(Category::getId))
+                                        .filter(Category::isStatus)
+                                        .forEach(category -> PrintForm.tableF("%5s | %-30s\n", category.getId(), category.getName()));
+                    PrintForm.tableF("%5s | %-30s\n", "0", "Chưa có danh mục");
                     PrintForm.productMenu("Chọn mã của danh mục muốn thêm: ");
                     int idCategory = Integer.parseInt(sc.nextLine());
                     setCategoryId(idCategory);
@@ -265,8 +274,8 @@ public class Product implements IProduct, Serializable {
                 break;
             } catch (NumberFormatException nfe) {
                 PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến " + categories.size());
-            } catch (Exception e) {
-                PrintForm.warning(e.getMessage());
+            } catch (ProductException pe) {
+                PrintForm.warning(pe.getMessage());
             }
         } while (true);
     }
@@ -276,7 +285,7 @@ public class Product implements IProduct, Serializable {
         IProduct.super.displayData();
         List<Category> categories = CategoryServiceImpl.getCategories();
         Category category = categories.stream().filter(c -> c.getId() == getCategoryId()).findFirst().orElse(null);
-        PrintForm.printTableF("%5s | %-30s | %15.2s | %15.2s | %15.2s | %-30s | %10s | %s \n",
+        PrintForm.tableF("%5s | %-30s | %15.2f | %15.2f | %15.2f | %-30s | %10s | %s \n",
                 getId(),
                 getName(),
                 getImportPrice(),

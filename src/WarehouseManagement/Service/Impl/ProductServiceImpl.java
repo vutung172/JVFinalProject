@@ -2,19 +2,19 @@ package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.ProductService;
-import WarehouseManagement.entity.FontConfig.ColorFont;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Product;
 
 import java.util.*;
 
 public class ProductServiceImpl implements BaseService<Product>, ProductService {
-    private static IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
-    private final String path = "products.txt";
+    private static final IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
+    private final String fileName = "products.txt";
 
     public String getPath() {
-        return path;
+        return fileName;
     }
+
     //Singleton cho class CategoryService
     private static ProductServiceImpl productServiceInstance;
 
@@ -38,9 +38,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         return products;
     }
 
-    //FontColor
-    private static String fontColor = ColorFont.BLUE;
-
+    //Service methods
     @Override
     public void add(Product product) {
         if (searchProductById(product.getId()) != null) {
@@ -48,7 +46,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.add(product);
             PrintForm.success("Thêm sản phẩm thành công");
-            productIOServiceImpl.writeToFile(products,this.path);
+            productIOServiceImpl.writeToFile(products,this.fileName);
         }
     }
 
@@ -59,13 +57,13 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             do {
                 PrintForm.productMenuln("===== CẬP NHẬT SẢN PHẨM =====");
-                PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                         "Mã sp",
                         "Tên sản phẩm",
-                        "Giá mua",
-                        "Giá bán",
-                        "Lợi nhuận",
-                        "Mã danh mục",
+                        "Giá mua (USD)",
+                        "Giá bán (USD)",
+                        "Lợi nhuận (USD)",
+                        "Danh mục sản phẩm",
                         "Trạng thái",
                         "Mô tả");
                 updateProduct.displayData();
@@ -117,7 +115,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 } catch (Exception e) {
                     PrintForm.warning(e.getMessage());
                 }
-                productIOServiceImpl.writeToFile(products,this.path);
+                productIOServiceImpl.writeToFile(products,this.fileName);
             } while (true);
         }
     }
@@ -129,7 +127,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.remove(product);
             PrintForm.success("Xóa sản phẩm \""+product.getName()+"\" thành công.");
-            productIOServiceImpl.writeToFile(products,this.path);
+            productIOServiceImpl.writeToFile(products,this.fileName);
         }
     }
 
@@ -140,28 +138,28 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             switch (sortType) {
                 case "ASC":
-                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
-                            "Giá mua",
-                            "Giá bán",
-                            "Lợi nhuận",
-                            "Mã danh mục",
+                            "Giá mua (USD)",
+                            "Giá bán (USD)",
+                            "Lợi nhuận (USD)",
+                            "Danh mục sản phẩm",
                             "Trạng thái",
                             "Mô tả");
-                    products.stream().sorted((p1,p2) -> p1.getName().compareTo(p2.getName())).forEach(Product::displayData);
+                    products.stream().sorted(Comparator.comparing(Product::getName)).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
-                            "Giá mua",
-                            "Giá bán",
-                            "Lợi nhuận",
-                            "Mã danh mục",
+                            "Giá mua (USD)",
+                            "Giá bán (USD)",
+                            "Lợi nhuận (USD)",
+                            "Danh mục sản phẩm",
                             "Trạng thái",
                             "Mô tả");
-                    products.stream().sorted((p1,p2) -> p2.getName().compareToIgnoreCase(p1.getName())).forEach(Product::displayData);
+                    products.stream().sorted(Comparator.comparing(Product::getName).reversed()).forEach(Product::displayData);
                     break;
                 default:
                     System.err.println("Lỗi lựa chon");
@@ -176,25 +174,25 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             switch (sortType) {
                 case "ASC":
-                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
-                            "Giá mua",
-                            "Giá bán",
-                            "Lợi nhuận",
-                            "Mã danh mục",
+                            "Giá mua (USD)",
+                            "Giá bán (USD)",
+                            "Lợi nhuận (USD)",
+                            "Danh mục sản phẩm",
                             "Trạng thái",
                             "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getProfit)).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
-                            "Giá mua",
-                            "Giá bán",
-                            "Lợi nhuận",
-                            "Mã danh mục",
+                            "Giá mua (USD)",
+                            "Giá bán (USD)",
+                            "Lợi nhuận (USD)",
+                            "Danh mục sản phẩm",
                             "Trạng thái",
                             "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getProfit).reversed()).forEach(Product::displayData);
@@ -207,59 +205,90 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
 
     @Override
     public List<Product> searchAny(String searchKey) {
-        List<Product> searchAnyList = new ArrayList<>();
         String checkType = checkDataType(searchKey);
+        String key = searchKey.toLowerCase();
+
+        List<Product> searchAnyList = new ArrayList<>();
+
+        //Tìm kiếm trong danh mục
+        CategoryServiceImpl categoryService = CategoryServiceImpl.getCategoryServiceInstance();
+        Map<Integer,String> currentCategoryMap = new HashMap<>();
+        if ("chưa có danh mục".contains(key)) {
+            currentCategoryMap.put(0, "Chưa có danh mục");
+        }
+        categoryService.searchCategoryByName(key).stream().forEach(category -> currentCategoryMap.put(category.getId(), category.getName()));
+        //Tìm kiếm trong trạng thái
+
         switch (checkType) {
             case "INTEGER":
                 Set<String> idFoundList = new HashSet<>();
-                products.stream().filter(p1 -> p1.getName().contains(searchKey))
+                products.stream().filter(p1 -> p1.getName().toLowerCase().contains(key))
                         .forEach(p1 -> idFoundList.add(p1.getId()));
-                products.stream().filter(p2 -> p2.getId().contains(searchKey))
+                products.stream().filter(p2 -> p2.getId().toLowerCase().contains(key))
                         .forEach(p2 -> idFoundList.add(p2.getId()));
-                products.stream().filter(p3 -> String.valueOf(p3.getImportPrice()).contains(searchKey))
+                products.stream().filter(p3 -> String.valueOf(p3.getImportPrice()).contains(key))
                         .forEach(p3 -> idFoundList.add(p3.getId()));
-                products.stream().filter(p4 -> String.valueOf(p4.getExportPrice()).contains(searchKey))
+                products.stream().filter(p4 -> String.valueOf(p4.getExportPrice()).contains(key))
                         .forEach(p4 -> idFoundList.add(p4.getId()));
-                products.stream().filter(p5 -> String.valueOf(p5.getProfit()).contains(searchKey))
+                products.stream().filter(p5 -> String.valueOf(p5.getProfit()).contains(key))
                         .forEach(p5 -> idFoundList.add(p5.getId()));
-                products.stream().filter(p6 -> p6.getDescription().contains(searchKey))
+                products.stream().filter(p6 -> p6.getDescription().toLowerCase().contains(key))
                         .forEach(p6 -> idFoundList.add(p6.getId()));
+                //tìm theo danh mục
+                products.stream().filter(p7 -> currentCategoryMap.containsKey(p7.getCategoryId()))
+                        .forEach(p7 -> idFoundList.add(p7.getId()));
+
                 for (String id:idFoundList) {
                     searchAnyList.add(products.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null));
                 }
                 return searchAnyList;
             case "DOUBLE":
                 Set<String> idFoundList2 = new HashSet<>();
-                products.stream().filter(p1 -> p1.getName().contains(searchKey))
+                products.stream().filter(p1 -> p1.getName().toLowerCase().contains(key))
                         .forEach(p1 -> idFoundList2.add(p1.getId()));
-                products.stream().filter(p3 -> String.valueOf(p3.getImportPrice()).contains(searchKey))
+                products.stream().filter(p3 -> String.valueOf(p3.getImportPrice()).contains(key))
                         .forEach(p3 -> idFoundList2.add(p3.getId()));
-                products.stream().filter(p4 -> String.valueOf(p4.getExportPrice()).contains(searchKey))
+                products.stream().filter(p4 -> String.valueOf(p4.getExportPrice()).contains(key))
                         .forEach(p4 -> idFoundList2.add(p4.getId()));
-                products.stream().filter(p5 -> String.valueOf(p5.getProfit()).contains(searchKey))
+                products.stream().filter(p5 -> String.valueOf(p5.getProfit()).contains(key))
                         .forEach(p5 -> idFoundList2.add(p5.getId()));
-                products.stream().filter(p6 -> p6.getDescription().contains(searchKey))
+                products.stream().filter(p6 -> p6.getDescription().toLowerCase().contains(key))
                         .forEach(p6 -> idFoundList2.add(p6.getId()));
+                //tìm theo danh mục
+                products.stream().filter(p7 -> currentCategoryMap.containsKey(p7.getCategoryId()))
+                        .forEach(p7 -> idFoundList2.add(p7.getId()));
+
                 for (String id:idFoundList2) {
                     searchAnyList.add(products.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null));
                 }
                 return searchAnyList;
             case "STRING":
                 Set<String> idFoundList3 = new HashSet<>();
-                products.stream().filter(p1 -> p1.getName().contains(searchKey))
+                products.stream().filter(p1 -> p1.getName().toLowerCase().contains(key))
                         .forEach(p1 -> idFoundList3.add(p1.getId()));
-                products.stream().filter(p2 -> p2.getId().contains(searchKey))
+                products.stream().filter(p2 -> p2.getId().toLowerCase().contains(key))
                         .forEach(p2 -> idFoundList3.add(p2.getId()));
-                products.stream().filter(p6 -> p6.getDescription().contains(searchKey))
-                        .forEach(p6 -> idFoundList3.add(p6.getId()));
+                products.stream().filter(p6 -> p6.getDescription().toLowerCase().contains(key))
+                        .forEach(p3 -> idFoundList3.add(p3.getId()));
+                //tìm theo danh mục
+                products.stream().filter(p4 -> currentCategoryMap.containsKey(p4.getCategoryId()))
+                        .forEach(p4 -> idFoundList3.add(p4.getId()));
+                //tìm theo trạng thái
+                if("đang bán".contains(key)){
+                    products.stream().filter(Product::isStatus).forEach(p5 -> idFoundList3.add(p5.getId()));
+                }
+                if ("dừng bán".contains(key)) {
+                    products.stream().filter(p6 -> !p6.isStatus()).forEach(p6 -> idFoundList3.add(p6.getId()));
+                }
+
                 for (String id:idFoundList3) {
                     searchAnyList.add(products.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null));
                 }
                 return searchAnyList;
             default:
                 PrintForm.warning("Lỗi dữ liệu");
+                return null;
         }
-        return null;
     }
 
     public Product searchProductById(String id) {

@@ -30,8 +30,13 @@ public class PrintForm {
     public static void categoryMenu(String string){
         System.out.print(ColorFont.WHITE+string+ColorFont.RESET);
     }
-    public static void printTableF(String string, Object... args){
+    public static void tableF(String string, Object... args){
         System.out.print(ColorFont.PURPLE);
+        System.out.printf(string,args);
+        System.out.print(ColorFont.RESET);
+    }
+    public static void tableHeaderF(String string, Object... args){
+        System.out.print(ColorFont.BOLD+ColorFont.PURPLE);
         System.out.printf(string,args);
         System.out.print(ColorFont.RESET);
     }

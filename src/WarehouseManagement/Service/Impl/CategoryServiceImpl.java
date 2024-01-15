@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 public class CategoryServiceImpl implements BaseService<Category>, CategoryService {
     private static IOServiceImpl<Category> categoryIOServiceImpl = IOServiceImpl.getIoServiceInstance();
-    private final String path = "categories.txt";
+    private final String fileName = "categories.txt";
 
     public String getPath() {
-        return path;
+        return fileName;
     }
 
     //Singleton cho class CategoryService
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
             PrintForm.warning("Danh mục "+category.getName()+" đã tồn tại, không thể thêm");
         } else {
             categories.add(category);
-            categoryIOServiceImpl.writeToFile(categories, path);
+            categoryIOServiceImpl.writeToFile(categories, fileName);
             PrintForm.success("Đã thêm danh mục "+category.getName()+" thành công");
         }
     }
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
         } else {
             do {
                 PrintForm.categoryMenuln("===== CẬP NHẬT DANH MỤC =====");
-                PrintForm.printTableF("%s | %s | %s | %s \n",
+                PrintForm.tableHeaderF("%5s | %-30s | %15s | %s \n",
                         "Mã",
                         "Tên danh mục",
                         "Trạng thái",
@@ -78,15 +78,15 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
                         switch (choice) {
                             case 1:
                                 updateCategory.inputName(sc);
-                                PrintForm.success("Cập nhật thành công tên cho sản phẩm có ID là: "+updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công tên cho sản phẩm có mã là: "+updateCategory.getId());
                                 break;
                             case 2:
                                 updateCategory.inputStatus(sc);
-                                PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có ID là: "+updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có mã là: "+updateCategory.getId());
                                 break;
                             case 3:
                                 updateCategory.inputCategoryDescription(sc);
-                                PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có ID là: "+updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có mã là: "+updateCategory.getId());
                                 break;
                             default:
                                 PrintForm.warning("Lựa chọn không phù hợp");
@@ -99,7 +99,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
                 } catch (Exception e) {
                     PrintForm.warning(e.getMessage());
                 } finally {
-                    categoryIOServiceImpl.writeToFile(categories, path);
+                    categoryIOServiceImpl.writeToFile(categories, fileName);
                 }
             } while (true);
         }
@@ -112,12 +112,12 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
         if (searchCategoryById(category.getId()) == null) {
             PrintForm.warning("Danh mục "+category.getName()+" không tồn tại, không thể xóa");
         } else if (count != 0) {
-            PrintForm.warning("Danh mục "+category.getName()+" đã có"+count+" sản phẩm, không thể xóa");
+            PrintForm.warning("Danh mục "+category.getName()+" đã có "+count+" sản phẩm, không thể xóa");
         } else {
             categories.remove(category);
             PrintForm.success("Xóa danh mục "+category.getName()+" thành công");
         }
-        categoryIOServiceImpl.writeToFile(categories, path);
+        categoryIOServiceImpl.writeToFile(categories, fileName);
     }
 
     @Override

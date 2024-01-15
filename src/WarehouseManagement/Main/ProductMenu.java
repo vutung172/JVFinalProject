@@ -92,13 +92,13 @@ public class ProductMenu {
                     if (searchedList.isEmpty()){
                         PrintForm.attention("Không tìm thấy sản phẩm nào có chứa từ khóa: "+searchKey);
                     } else {
-                        PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                        PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
                                 "Mã sp",
                                 "Tên sản phẩm",
-                                "Giá mua",
-                                "Giá bán",
-                                "Lợi nhuận",
-                                "Mã danh mục",
+                                "Giá mua (USD)",
+                                "Giá bán (USD)",
+                                "Lợi nhuận (USD)",
+                                "Danh mục sản phẩm",
                                 "Trạng thái",
                                 "Mô tả");
                         searchedList.stream().forEach(Product::displayData);

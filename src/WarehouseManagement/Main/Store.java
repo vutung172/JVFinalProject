@@ -6,7 +6,7 @@ import WarehouseManagement.entity.FontConfig.PrintForm;
 import java.util.Scanner;
 
 public class Store{
-    public static void main(String[] args)throws Exception{
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         do {
             PrintForm.mainMenuln("===== QUẢN LÝ KHO =====");

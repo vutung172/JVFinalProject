@@ -21,8 +21,8 @@ public class CategoryMenu {
             PrintForm.categoryMenuln("1. Thêm mới danh mục");
             PrintForm.categoryMenuln("2. Cập nhật danh mục");
             PrintForm.categoryMenuln("3. Xóa danh mục");
-            PrintForm.categoryMenuln("4. Tìm kiếm danh mục theo tên danh mục");
-            PrintForm.categoryMenuln("5. Thống kê số lượng sp đang có trong danh mục");
+            PrintForm.categoryMenuln("4. Tìm kiếm danh mục theo tên");
+            PrintForm.categoryMenuln("5. Thống kê số lượng sản phẩm đang có trong danh mục");
             PrintForm.categoryMenuln("6. Quay lại");
             PrintForm.categoryMenu("Mời nhập vào lựa chọn của bạn: ");
             try {
@@ -55,11 +55,11 @@ public class CategoryMenu {
             case 2:
                 do {
                     try{
-                        PrintForm.categoryMenuln("Nhập vào ID của danh mục muốn cập nhật: ");
+                        PrintForm.categoryMenuln("Nhập vào mã của danh mục muốn cập nhật: ");
                         int idUpdate = Integer.parseInt(sc.nextLine());
                         Category updateCategory = categoryService.searchCategoryById(idUpdate);
                         if (updateCategory == null){
-                            PrintForm.warning("Sản phẩm có ID là: "+idUpdate+" không tồn tại");
+                            PrintForm.warning("Sản phẩm có mã là: "+idUpdate+" không tồn tại");
                         } else {
                             categoryService.update(sc,updateCategory);
                         }
@@ -73,11 +73,11 @@ public class CategoryMenu {
             case 3:
                 do {
                     try{
-                        PrintForm.categoryMenuln("Nhập vào ID của danh mục muốn xóa: ");
+                        PrintForm.categoryMenuln("Nhập vào mã của danh mục muốn xóa: ");
                         int idUpdate = Integer.parseInt(sc.nextLine());
                         Category deleteCategory = categoryService.searchCategoryById(idUpdate);
                         if (deleteCategory == null){
-                            PrintForm.warning("Sản phẩm có ID là "+idUpdate+" không tồn tại");
+                            PrintForm.warning("Sản phẩm có mã là "+idUpdate+" không tồn tại");
                         } else {
                             categoryService.delete(deleteCategory);
                         }
@@ -96,7 +96,7 @@ public class CategoryMenu {
                     if (searchedList.isEmpty()){
                         PrintForm.attention("Không tìm thấy sản phẩm nào có từ khóa chứa: "+ searchKey);
                     } else {
-                        PrintForm.printTableF("%5s | %30s | %15s |%s |\n","Mã","Tên danh mục","Trạng thái","Mô tả");
+                        PrintForm.tableHeaderF("%5s | %-30s | %15s |%s |\n","Mã","Tên danh mục","Trạng thái","Mô tả");
                         searchedList.forEach(Category::displayData);
                     }
                     PrintForm.categoryMenu("Bạn có muốn tiếp tục tìm kiếm sản phẩm khác không (Y/N):");
@@ -104,8 +104,8 @@ public class CategoryMenu {
                 } while (selection.equalsIgnoreCase("Y"));
                 break;
             case 5:
-                PrintForm.printTableF("%30s | %-15s \n","Tên danh mục","Số sản phẩm");
-                categoryService.synthesizeCategoryByProductQuantity(products).forEach((k,v) -> PrintForm.printTableF("%30s | %-15s \n",k,v));
+                PrintForm.tableF("%30s | %-15s \n","Tên danh mục","Số sản phẩm");
+                categoryService.synthesizeCategoryByProductQuantity(products).forEach((k,v) -> PrintForm.tableF("%30s | %-15s \n",k,v));
                 break;
             default:
                 PrintForm.warning("Lựa chọn không phù hợp");
