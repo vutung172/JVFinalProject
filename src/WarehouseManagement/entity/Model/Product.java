@@ -1,7 +1,9 @@
-package WarehouseManagement.entity;
+package WarehouseManagement.entity.Model;
 
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
+import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.IProduct;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -12,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Product implements IProduct, Serializable {
+    private static final long serialVersionUID = 20230113183502L;
     private String id;
     private String name;
     private double importPrice;
@@ -20,7 +23,6 @@ public class Product implements IProduct, Serializable {
     private String description;
     private boolean status;
     private int categoryId;
-    private List<Category> categories = CategoryServiceImpl.getCategories();
 
     public Product() {
     }
@@ -44,7 +46,7 @@ public class Product implements IProduct, Serializable {
         if (!isValid(id, "P.{3}")) {
             throw new Exception("ID phải gồm 4 kí tự, và bắt đầu là P");
         } else if (isExisted(product -> product.getId().equals(id))) {
-            throw new Exception("ID đã tô tại");
+            throw new Exception("ID đã tồn tại");
         } else {
             this.id = id;
         }
@@ -71,15 +73,14 @@ public class Product implements IProduct, Serializable {
     public void setImportPrice(double importPrice) throws Exception {
         if (importPrice <= 0) {
             throw new Exception("Giá nhập phải lớn hơn 0");
-        } else if (this.exportPrice != 0){
-            if (importPrice > (this.exportPrice/(1 + MIN_INTEREST_RATE))) {
+        } else if (this.exportPrice != 0) {
+            if (importPrice > (this.exportPrice / (1 + MIN_INTEREST_RATE))) {
                 throw new Exception("Giá nhập phải nhỏ hơn: " + (this.exportPrice / (1 + MIN_INTEREST_RATE)) + " USD.");
             } else {
                 this.importPrice = importPrice;
                 calProfit();
             }
-        }
-        else {
+        } else {
             this.importPrice = importPrice;
             calProfit();
         }
@@ -112,8 +113,8 @@ public class Product implements IProduct, Serializable {
         return description;
     }
 
-    public void setDescription(String description) throws Exception{
-        if (description.trim().isEmpty()){
+    public void setDescription(String description) throws Exception {
+        if (description.trim().isEmpty()) {
             throw new Exception("Yêu cầu phải nhập mô tả cho sản phẩm");
         } else {
             this.description = description;
@@ -132,16 +133,11 @@ public class Product implements IProduct, Serializable {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) throws Exception {
-        Category category = categories.stream().filter(c -> c.getId() == categoryId)
-                .findFirst()
-                .orElse(null);
-        if (category == null) {
-            throw new Exception("Category không tồn tại");
-        }else {
-            this.categoryId = categoryId;
-        }
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
+
+    //Color Font
 
     // Phương thức của đối tượng Product
     @Override
@@ -159,12 +155,12 @@ public class Product implements IProduct, Serializable {
     public void inputIdProduct(Scanner sc) {
         do {
             try {
-                System.out.println("Mời nhập vào ID của sản phẩm: ");
+                PrintForm.productMenuln("Mời nhập vào ID của sản phẩm: ");
                 String idProduct = sc.nextLine();
                 setId(idProduct);
                 break;
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         } while (true);
 
@@ -173,12 +169,12 @@ public class Product implements IProduct, Serializable {
     public void inputProductName(Scanner sc) {
         do {
             try {
-                System.out.println("Mời nhập vào tên sản phẩm: ");
+                PrintForm.productMenuln("Mời nhập vào tên sản phẩm: ");
                 String productNameInput = sc.nextLine();
                 setName(productNameInput);
                 break;
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         } while (true);
     }
@@ -186,29 +182,29 @@ public class Product implements IProduct, Serializable {
     public void inputImportPrice(Scanner sc) {
         do {
             try {
-                System.out.println("Mời nhập vào giá nhập sản phẩm: ");
+                PrintForm.productMenuln("Mời nhập vào giá nhập sản phẩm: ");
                 double importPriceInput = Double.parseDouble(sc.nextLine());
                 setImportPrice(importPriceInput);
                 break;
-            }catch (NumberFormatException nfe){
-                System.err.println(nfe.getMessage());
-            } catch (Exception e){
-                System.err.println(e.getMessage());
+            } catch (NumberFormatException nfe) {
+                PrintForm.warning(nfe.getMessage());
+            } catch (Exception e) {
+                PrintForm.warning(e.getMessage());
             }
-        }while (true);
+        } while (true);
     }
 
     public void inputExportPrice(Scanner sc) {
         do {
             try {
-                System.out.println("Mời nhập vào giá bán sản phẩm: ");
+                PrintForm.productMenuln("Mời nhập vào giá bán sản phẩm: ");
                 double exportPriceInput = Double.parseDouble(sc.nextLine());
                 setExportPrice(exportPriceInput);
                 break;
-            } catch (NumberFormatException nfe){
-                System.err.println(nfe.getMessage());
-            } catch (Exception e){
-                System.err.println(e.getMessage());
+            } catch (NumberFormatException nfe) {
+                PrintForm.warning(nfe.getMessage());
+            } catch (Exception e) {
+                PrintForm.warning(e.getMessage());
             }
         } while (true);
     }
@@ -216,56 +212,61 @@ public class Product implements IProduct, Serializable {
     public void inputProductDescription(Scanner sc) {
         do {
             try {
-                System.out.println("Nhập vào mô tả cho sản phầm: ");
+                PrintForm.productMenuln("Nhập vào mô tả cho sản phầm: ");
                 String productDescription = sc.nextLine();
                 setDescription(productDescription);
                 break;
-            }catch (Exception e){
-                System.err.println(e.getMessage());
+            } catch (Exception e) {
+                PrintForm.warning(e.getMessage());
             }
-        }while (true);
+        } while (true);
     }
 
     public void inputStatus(Scanner sc) {
         do {
-            try{
-                System.out.println("Mời nhập vào trạng thái của sản phẩm: ");
-                System.out.println("1. Đang bán");
-                System.out.println("2. Đã ngừng bán");
-                System.out.print("Mời chọn lựa chọn trạng thái: ");
+            try {
+                PrintForm.productMenuln("Mời nhập vào trạng thái của sản phẩm: ");
+                PrintForm.productMenuln("1. Đang bán");
+                PrintForm.productMenuln("2. Dừng bán");
+                PrintForm.productMenu("Mời chọn lựa chọn trạng thái: ");
                 int statusProduct = Integer.parseInt(sc.nextLine());
-                if(statusProduct == 1){
+                if (statusProduct == 1) {
                     setStatus(true);
                     break;
                 } else if (statusProduct == 2) {
                     setStatus(false);
                     break;
                 } else {
-                    System.err.println("Lựa chọn không phù hợp");
+                    PrintForm.warning("Lựa chọn không phù hợp");
                 }
-            }catch (NumberFormatException nfe){
-                System.err.println(nfe.getMessage());
-            } catch (Exception e){
-                System.out.println(e.getMessage());
+            } catch (NumberFormatException nfe) {
+                PrintForm.warning(nfe.getMessage());
+            } catch (Exception e) {
+                PrintForm.warning(e.getMessage());
             }
-        }while (true);
+        } while (true);
     }
 
-    public void inputCategoryId(Scanner sc){
+    public void inputCategoryId(Scanner sc) {
+        List<Category> categories = CategoryServiceImpl.getCategories();
         do {
             try {
                 if (categories.isEmpty()) {
-                    System.err.println("Danh sách danh mục hiện đang trống, không thể chọn");
+                    PrintForm.warning("Hiện chưa có danh mục nào trong danh sách, không thể chọn");
+                    setCategoryId(0);
                 } else {
-                    System.out.printf("%s | %s\n","Mã","Tên danh mục");
-                    categories.stream().sorted(Comparator.comparing(Category::getId)).forEach(category -> System.out.printf("%s | %s\n", category.getId(), category.getName()));
-                    System.out.print("Nhập vào mã của danh mục muốn thêm: ");
+                    PrintForm.printTableF("%5s | %-30s\n", "Mã", "Tên danh mục");
+                    PrintForm.printTableF("%5s | %-30s\n", "0", "Chưa có danh mục");
+                    categories.stream().sorted(Comparator.comparing(Category::getId)).forEach(category -> PrintForm.printTableF("%5s | %-30s\n", category.getId(), category.getName()));
+                    PrintForm.productMenu("Chọn mã của danh mục muốn thêm: ");
                     int idCategory = Integer.parseInt(sc.nextLine());
                     setCategoryId(idCategory);
                 }
                 break;
+            } catch (NumberFormatException nfe) {
+                PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến " + categories.size());
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         } while (true);
     }
@@ -273,15 +274,16 @@ public class Product implements IProduct, Serializable {
     @Override
     public void displayData() {
         IProduct.super.displayData();
+        List<Category> categories = CategoryServiceImpl.getCategories();
         Category category = categories.stream().filter(c -> c.getId() == getCategoryId()).findFirst().orElse(null);
-        System.out.printf("%s | %s | %s | %s | %s | %s | %s | %s |\n",
+        PrintForm.printTableF("%5s | %-30s | %15.2s | %15.2s | %15.2s | %-30s | %10s | %s \n",
                 getId(),
                 getName(),
                 getImportPrice(),
                 getExportPrice(),
                 getProfit(),
                 category != null ? category.getName() : "Chưa có danh mục",
-                isStatus()?"Đang bán":"Đã ngừng bán",
+                isStatus() ? "Đang bán" : "Dừng bán",
                 getDescription());
     }
 

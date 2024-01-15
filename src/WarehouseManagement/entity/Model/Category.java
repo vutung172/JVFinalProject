@@ -1,6 +1,8 @@
-package WarehouseManagement.entity;
+package WarehouseManagement.entity.Model;
 
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
+import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.ICategory;
 
 import java.io.Serializable;
 import java.util.Scanner;
@@ -8,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Category implements ICategory, Serializable {
+    private static final long serialVersionUID = 20230113202210L;
     private int id;
     private String name;
     private String description;
@@ -90,26 +93,26 @@ public class Category implements ICategory, Serializable {
     public void inputId(Scanner sc){
         do {
             try{
-                System.out.println("Mời nhập vào ID của Category: ");
+                PrintForm.categoryMenuln("Mời nhập vào ID của Category: ");
                 int idCategory = Integer.parseInt(sc.nextLine());
                 setId(idCategory);
                 break;
             }catch (NumberFormatException nfe){
-                System.err.println("ID phải là số nguyên");
+                PrintForm.warning("ID phải là số nguyên");
             } catch (Exception e){
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         }while (true);
     }
     public void inputName(Scanner sc){
         do {
             try{
-                System.out.println("Mời nhập vào tên Category: ");
+                PrintForm.categoryMenuln("Mời nhập vào tên Category: ");
                 String nameCategory = sc.nextLine();
                 setName(nameCategory);
                 break;
             }catch (Exception e){
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         }while (true);
 
@@ -117,21 +120,21 @@ public class Category implements ICategory, Serializable {
     public void inputCategoryDescription(Scanner sc){
         do {
             try{
-                System.out.println("Mời nhập vào mô tả: ");
+                PrintForm.categoryMenuln("Mời nhập vào mô tả: ");
                 String descriptionCategory = sc.nextLine();
                 setDescription(descriptionCategory);
                 break;
             }catch (Exception e){
-                System.err.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         }while (true);
     }
     public void inputStatus(Scanner sc){
         do {
             try{
-                System.out.println("Mời nhập vào trạng thái: ");
-                System.out.println("1. Đang hoạt động");
-                System.out.println("2. Tạm dừng");
+                PrintForm.categoryMenuln("Mời nhập vào trạng thái: ");
+                PrintForm.categoryMenuln("1. Đang hoạt động");
+                PrintForm.categoryMenuln("2. Tạm dừng");
                 System.out.print("Mời chọnluwaja trạng thái: ");
                 int status = Integer.parseInt(sc.nextLine());
                 if(status == 1){
@@ -141,19 +144,19 @@ public class Category implements ICategory, Serializable {
                     setStatus(false);
                     break;
                 } else {
-                    System.err.println("Lựa chọn không phù hợp");
+                    PrintForm.warning("Lựa chọn không phù hợp");
                 }
             }catch (NumberFormatException nfe){
-                System.err.println(nfe.getMessage());
+                PrintForm.warning(nfe.getMessage());
             } catch (Exception e){
-                System.out.println(e.getMessage());
+                PrintForm.warning(e.getMessage());
             }
         }while (true);
     }
 
     @Override
     public void displayData() {
-        System.out.printf("%s | %s | %s |%s |\n",
+        PrintForm.printTableF("%5s | %30s | %15s |%s |\n",
                 getId(),
                 getName(),
                 isStatus()?"Đang hoạt động":"Tạm dừng",

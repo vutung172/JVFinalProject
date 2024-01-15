@@ -2,7 +2,9 @@ package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.ProductService;
-import WarehouseManagement.entity.Product;
+import WarehouseManagement.entity.FontConfig.ColorFont;
+import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.Model.Product;
 
 import java.util.*;
 
@@ -36,13 +38,16 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         return products;
     }
 
+    //FontColor
+    private static String fontColor = ColorFont.BLUE;
+
     @Override
     public void add(Product product) {
         if (searchProductById(product.getId()) != null) {
-            System.err.printf("Sản phẩm %s đã tồn tại, không thể thêm", product.getName());
+            PrintForm.warning("Sản phẩm"+product.getName()+"đã tồn tại, không thể thêm");
         } else {
             products.add(product);
-            System.out.println("Thêm sản pẩm thành công");
+            PrintForm.success("Thêm sản phẩm thành công");
             productIOServiceImpl.writeToFile(products,this.path);
         }
     }
@@ -50,11 +55,11 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     @Override
     public void update(Scanner sc, Product updateProduct) {
         if (searchProductById(updateProduct.getId()) == null) {
-            System.err.printf("Sản phẩm %s không tồn tại, không thể update", updateProduct.getName());
+            PrintForm.warning("Sản phẩm "+updateProduct.getName()+" không tồn tại, không thể cập nhật");
         } else {
             do {
-                System.out.println("===== CẬP NHẬT SẢN PHẨM =====");
-                System.out.printf("%s | %s | %s | %s | %s | %s | %s | %s |\n",
+                PrintForm.productMenuln("===== CẬP NHẬT SẢN PHẨM =====");
+                PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
                         "Mã sp",
                         "Tên sản phẩm",
                         "Giá mua",
@@ -64,14 +69,14 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                         "Trạng thái",
                         "Mô tả");
                 updateProduct.displayData();
-                System.out.println("1. Cập nhật tên sản phẩm");
-                System.out.println("2. Cập nhật giá bán");
-                System.out.println("3. Cập nhật giá mua");
-                System.out.println("4. Cập nhật mã danh muc của sản phẩm");
-                System.out.println("5. Cập nhật Trạng thái sản phẩm");
-                System.out.println("6. Cập nhật mô tả sản phẩm");
-                System.out.println("7. Quay lại");
-                System.out.print("Mời bạn lựa chọn : ");
+                PrintForm.productMenuln("1. Cập nhật tên sản phẩm");
+                PrintForm.productMenuln("2. Cập nhật giá bán");
+                PrintForm.productMenuln("3. Cập nhật giá mua");
+                PrintForm.productMenuln("4. Cập nhật mã danh muc của sản phẩm");
+                PrintForm.productMenuln("5. Cập nhật Trạng thái sản phẩm");
+                PrintForm.productMenuln("6. Cập nhật mô tả sản phẩm");
+                PrintForm.productMenuln("7. Quay lại");
+                PrintForm.productMenu("Mời bạn lựa chọn : ");
                 try {
                     int choice = Integer.parseInt(sc.nextLine());
                     if (choice == 7) {
@@ -80,41 +85,39 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                         switch (choice) {
                             case 1:
                                 updateProduct.inputProductName(sc);
-                                System.out.printf("Cập nhật thành công tên cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                PrintForm.success("Cập nhật thành công tên cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 2:
                                 updateProduct.inputImportPrice(sc);
-                                System.out.printf("Cập nhật thành công giá mua cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 3:
                                 updateProduct.inputExportPrice(sc);
-                                System.out.printf("Cập nhật thành công giá bán cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 4:
-                                updateProduct.inputProductDescription(sc);
-                                System.out.printf("Cập nhật thành công mô tả cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                updateProduct.inputCategoryId(sc);
+                                PrintForm.success("Cập nhật thành công danh mục cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 5:
                                 updateProduct.inputStatus(sc);
-                                System.out.printf("Cập nhật thành công trạng thái cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                PrintForm.success("Cập nhật thành công trạng thái cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 6:
-                                updateProduct.inputCategoryId(sc);
-                                System.out.printf("Cập nhật thành công mã danh mục cho sản phẩm có ID là %s.\n", updateProduct.getId());
+                                updateProduct.inputProductDescription(sc);
+                                PrintForm.success("Cập nhật thành công mô tả cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             default:
-                                System.err.println("Lựa chọn không phù hợp");
-                                break;
+                                PrintForm.warning("Lựa chọn không phù hợp");
                         }
 
                     }
                 } catch (NumberFormatException nfe) {
-                    System.err.println("Lựa chọn phải là số nguyên từ 1 đến 7");
+                    PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến 7");
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                } finally {
-                    productIOServiceImpl.writeToFile(products,this.path);
+                    PrintForm.warning(e.getMessage());
                 }
+                productIOServiceImpl.writeToFile(products,this.path);
             } while (true);
         }
     }
@@ -122,10 +125,10 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     @Override
     public void delete(Product product) {
         if (searchProductById(product.getId()) == null) {
-            System.err.printf("Sản phẩm %s không tồn tại.\n", product.getName());
+            PrintForm.warning("Sản phẩm"+product.getName()+"không tồn tại");
         } else {
             products.remove(product);
-            System.out.printf("Xóa sản phẩm %s thành công.\n", product.getName());
+            PrintForm.success("Xóa sản phẩm \""+product.getName()+"\" thành công.");
             productIOServiceImpl.writeToFile(products,this.path);
         }
     }
@@ -133,14 +136,32 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     @Override
     public void displaySortedDataByName(String sortType) {
         if (products == null) {
-            System.err.println("Chưa có danh sách sản phẩm");
+            PrintForm.warning("Hiện chưa có sản phẩm trong danh sách");
         } else {
             switch (sortType) {
                 case "ASC":
-                    products.stream().sorted(Comparator.comparing(Product::getName)).forEach(Product::displayData);
+                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                            "Mã sp",
+                            "Tên sản phẩm",
+                            "Giá mua",
+                            "Giá bán",
+                            "Lợi nhuận",
+                            "Mã danh mục",
+                            "Trạng thái",
+                            "Mô tả");
+                    products.stream().sorted((p1,p2) -> p1.getName().compareTo(p2.getName())).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    products.stream().sorted(Comparator.comparing(Product::getName).reversed()).forEach(Product::displayData);
+                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                            "Mã sp",
+                            "Tên sản phẩm",
+                            "Giá mua",
+                            "Giá bán",
+                            "Lợi nhuận",
+                            "Mã danh mục",
+                            "Trạng thái",
+                            "Mô tả");
+                    products.stream().sorted((p1,p2) -> p2.getName().compareToIgnoreCase(p1.getName())).forEach(Product::displayData);
                     break;
                 default:
                     System.err.println("Lỗi lựa chon");
@@ -151,17 +172,35 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     @Override
     public void displaySortedDataByProfit(String sortType) {
         if (products == null) {
-            System.err.println("Chưa có danh sách sản phẩm");
+            PrintForm.warning("Hiện chưa có sản phẩm trong danh sách");
         } else {
             switch (sortType) {
                 case "ASC":
+                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                            "Mã sp",
+                            "Tên sản phẩm",
+                            "Giá mua",
+                            "Giá bán",
+                            "Lợi nhuận",
+                            "Mã danh mục",
+                            "Trạng thái",
+                            "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getProfit)).forEach(Product::displayData);
                     break;
                 case "DESC":
+                    PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                            "Mã sp",
+                            "Tên sản phẩm",
+                            "Giá mua",
+                            "Giá bán",
+                            "Lợi nhuận",
+                            "Mã danh mục",
+                            "Trạng thái",
+                            "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getProfit).reversed()).forEach(Product::displayData);
                     break;
                 default:
-                    System.err.println("Lỗi lựa chọn");
+                    PrintForm.warning("Lựa chọn không phù hợp");
             }
         }
     }
@@ -218,7 +257,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 }
                 return searchAnyList;
             default:
-                System.err.println("Lỗi dữ liệu");
+                PrintForm.warning("Lỗi dữ liệu");
         }
         return null;
     }

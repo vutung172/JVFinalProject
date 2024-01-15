@@ -1,6 +1,7 @@
 package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.IOService;
+import WarehouseManagement.entity.FontConfig.PrintForm;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,13 +28,13 @@ public class IOServiceImpl<C> implements IOService<C> {
             list = (List<C>) ois.readObject();
             ois.close();
             fis.close();
-            System.out.printf("Đọc dữ liệu từ file %s thành công.\n",path);
+            PrintForm.success("Đọc dữ liệu từ file "+path+" thành công.");
         } catch (FileNotFoundException fnf) {
-            System.err.println(fnf.getMessage());
+            PrintForm.warning(fnf.getMessage());
         } catch (IOException ioe) {
-            System.err.println(ioe.getMessage());
+            PrintForm.warning(ioe.getMessage());
         } catch (ClassNotFoundException cnf) {
-            System.err.println(cnf.getMessage());
+            PrintForm.warning(cnf.getMessage());
         }
         return list;
     }
@@ -47,11 +48,11 @@ public class IOServiceImpl<C> implements IOService<C> {
             oos.writeObject(list);
             oos.close();
             fos.close();
-            System.out.printf("Ghi dữ liệu ra file %s thành công.\n",path);
+            PrintForm.success("Ghi dữ liệu ra file "+path+" thành công.");
         } catch (FileNotFoundException fnf) {
-            System.err.println(fnf.getMessage());
+            PrintForm.warning(fnf.getMessage());
         } catch (IOException ioe) {
-            System.err.println(ioe.getMessage());
+            PrintForm.warning(ioe.getMessage());
         }
     }
 }

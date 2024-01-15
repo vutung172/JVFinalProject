@@ -2,8 +2,9 @@ package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.CategoryService;
-import WarehouseManagement.entity.Category;
-import WarehouseManagement.entity.Product;
+import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.Model.Category;
+import WarehouseManagement.entity.Model.Product;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,31 +44,32 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
     @Override
     public void add(Category category) {
         if (searchCategoryById(category.getId()) != null) {
-            System.out.printf("Danh mục %s đã tồn tại, không thể thêm", category.getName());
+            PrintForm.warning("Danh mục "+category.getName()+" đã tồn tại, không thể thêm");
         } else {
             categories.add(category);
             categoryIOServiceImpl.writeToFile(categories, path);
+            PrintForm.success("Đã thêm danh mục "+category.getName()+" thành công");
         }
     }
 
     @Override
     public void update(Scanner sc, Category updateCategory) {
         if (searchCategoryById(updateCategory.getId()) == null) {
-            System.out.printf("Danh mục %s không tồn tại, mời nhập lại", updateCategory.getName());
+            PrintForm.warning("Danh mục "+updateCategory.getName()+" không tồn tại, mời nhập lại");
         } else {
             do {
-                System.out.println("===== CẬP NHẬT DANH MỤC =====");
-                System.out.printf("%s | %s | %s | %s \n",
+                PrintForm.categoryMenuln("===== CẬP NHẬT DANH MỤC =====");
+                PrintForm.printTableF("%s | %s | %s | %s \n",
                         "Mã",
                         "Tên danh mục",
                         "Trạng thái",
                         "Mô tả");
                 updateCategory.displayData();
-                System.out.println("1. Cập nhật tên danh mục");
-                System.out.println("2. Cập nhật trạng thái danh mục");
-                System.out.println("3. Cập nhật mô tả danh mục");
-                System.out.println("4. Quay lại");
-                System.out.print("Mời bạn lựa chọn: ");
+                PrintForm.categoryMenuln("1. Cập nhật tên danh mục");
+                PrintForm.categoryMenuln("2. Cập nhật trạng thái danh mục");
+                PrintForm.categoryMenuln("3. Cập nhật mô tả danh mục");
+                PrintForm.categoryMenuln("4. Quay lại");
+                PrintForm.categoryMenu("Mời bạn lựa chọn: ");
                 try {
                     int choice = Integer.parseInt(sc.nextLine());
                     if (choice == 4) {
@@ -76,26 +78,26 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
                         switch (choice) {
                             case 1:
                                 updateCategory.inputName(sc);
-                                System.out.printf("Cập nhật thành công tên cho sản phẩm có ID là %s.\n", updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công tên cho sản phẩm có ID là: "+updateCategory.getId());
                                 break;
                             case 2:
                                 updateCategory.inputStatus(sc);
-                                System.out.printf("Cập nhật thành công giá mua cho sản phẩm có ID là %s.\n", updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có ID là: "+updateCategory.getId());
                                 break;
                             case 3:
                                 updateCategory.inputCategoryDescription(sc);
-                                System.out.printf("Cập nhật thành công giá bán cho sản phẩm có ID là %s.\n", updateCategory.getId());
+                                PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có ID là: "+updateCategory.getId());
                                 break;
                             default:
-                                System.err.println("Lựa chọn không phù hợp");
+                                PrintForm.warning("Lựa chọn không phù hợp");
                                 break;
                         }
                     }
 
                 } catch (NumberFormatException nfe) {
-                    System.err.println("Lựa chọn phải là số nguyên từ 1 đến 7");
+                    PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến 7");
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    PrintForm.warning(e.getMessage());
                 } finally {
                     categoryIOServiceImpl.writeToFile(categories, path);
                 }
@@ -108,12 +110,12 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
         List<Product> products = ProductServiceImpl.getProducts();
         long count = products.stream().filter(p -> p.getCategoryId() == category.getId()).count();
         if (searchCategoryById(category.getId()) == null) {
-            System.out.printf("Danh mục %s không tồn tại, không thể xóa", category.getName());
-        } else if (count > 0) {
-            System.out.printf("Danh mục %s đã có %s sản phẩm, không thể xóa", category.getName(), count);
+            PrintForm.warning("Danh mục "+category.getName()+" không tồn tại, không thể xóa");
+        } else if (count != 0) {
+            PrintForm.warning("Danh mục "+category.getName()+" đã có"+count+" sản phẩm, không thể xóa");
         } else {
             categories.remove(category);
-            System.out.printf("Xóa danh mục %s thành công", category.getName());
+            PrintForm.success("Xóa danh mục "+category.getName()+" thành công");
         }
         categoryIOServiceImpl.writeToFile(categories, path);
     }
@@ -127,7 +129,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
     @Override
     public Map<String, Long> synthesizeCategoryByProductQuantity(List<Product> products) {
         Map<Integer, Long> productCountByCategory = products.stream()
-                .collect(Collectors.groupingBy(Product::getCategoryId, Collectors.counting()));
+                                                            .collect(Collectors.groupingBy(Product::getCategoryId, Collectors.counting()));
         return categories.stream().collect(Collectors.toMap(Category::getName, c -> productCountByCategory.getOrDefault(c.getId(), 0L)));
     }
 

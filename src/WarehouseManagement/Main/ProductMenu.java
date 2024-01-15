@@ -2,26 +2,28 @@ package WarehouseManagement.Main;
 
 import WarehouseManagement.Service.Impl.IOServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
-import WarehouseManagement.entity.Product;
+import WarehouseManagement.entity.FontConfig.ColorFont;
+import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.Model.Product;
 
 import java.util.List;
 import java.util.Scanner;
 
-public class ProductManagement {
+public class ProductMenu {
     private static ProductServiceImpl productService = ProductServiceImpl.getProductServiceInstance();
     private static IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
     public static void displayMenu(Scanner sc){
         do {
-            System.out.print("\u001B[1;35m");
-            System.out.println("===== QUẢN LÝ SẢN PHẨM =====");
-            System.out.println("1. Thêm mới sản phẩm");
-            System.out.println("2. Cập nhật sản phẩm");
-            System.out.println("3. Xóa sản phẩm");
-            System.out.println("4. Hiển thị sản phẩm theo tên A-Z");
-            System.out.println("5. Hiển thị sản phẩm theo lợi nhuận từ cao-thấp");
-            System.out.println("6. Tìm kiếm sản phẩm");
-            System.out.println("7. Quay lại");
-            System.out.print("Mời nhập lựa chọn của bạn: ");
+            PrintForm.productMenu(ColorFont.BLUE);
+            PrintForm.productMenuln("===== QUẢN LÝ SẢN PHẨM =====");
+            PrintForm.productMenuln("1. Thêm mới sản phẩm");
+            PrintForm.productMenuln("2. Cập nhật sản phẩm");
+            PrintForm.productMenuln("3. Xóa sản phẩm");
+            PrintForm.productMenuln("4. Hiển thị sản phẩm theo tên A-Z");
+            PrintForm.productMenuln("5. Hiển thị sản phẩm theo lợi nhuận từ cao-thấp");
+            PrintForm.productMenuln("6. Tìm kiếm sản phẩm");
+            PrintForm.productMenuln("7. Quay lại");
+            PrintForm.productMenu("Mời nhập lựa chọn của bạn: ");
             try {
                 int choice = Integer.parseInt(sc.nextLine());
                 if (choice == 7){
@@ -31,12 +33,11 @@ public class ProductManagement {
                     menuSelection(sc,choice);
                 }
             } catch (NumberFormatException nfe){
-                System.err.println("Lựa cho phải là số nguyên từ 1 đến 7");
+                PrintForm.warning("Lựa cho phải là số nguyên từ 1 đến 7");
             }
         } while (true);
     }
     public static void menuSelection(Scanner sc,int choice){
-        System.out.print("\u001B[32m");
         switch (choice){
             case 1:
                 String selection;
@@ -44,36 +45,36 @@ public class ProductManagement {
                     Product product = new Product();
                     product.inputData(sc);
                     productService.add(product);
-                    System.out.print("Bạn có muốn tiếp tục thêm sản phẩm không (Y/N):");
+                    PrintForm.productMenu("Bạn có muốn tiếp tục thêm sản phẩm không (Y/N):");
                     selection = sc.nextLine();
                 } while (selection.equalsIgnoreCase("Y"));
                 break;
             case 2:
                 do {
-                    System.out.println("Nhập vào ID muốn cập nhật: ");
+                    PrintForm.productMenuln("Nhập vào ID muốn cập nhật: ");
                     String idUpdate = sc.nextLine();
                     Product updateProduct = productService.searchProductById(idUpdate);
                     if(updateProduct == null){
-                        System.err.printf("Sản phẩm có ID là %s không tồn tại.\n",idUpdate);
+                        PrintForm.warning("Sản phẩm có ID là "+idUpdate+" Không tồn tại");
                     } else {
                         productService.update(sc,updateProduct);
                     }
-                    System.out.print("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
+                    PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
                     selection = sc.nextLine();
                 } while (selection.equalsIgnoreCase("Y"));
                 break;
             case 3:
                 do {
-                    System.out.println("Nhập vào ID cảu sản phẩm muốn xóa: ");
+                    PrintForm.productMenuln("Nhập vào ID của sản phẩm muốn xóa: ");
                     String idDelete = sc.next();
                     Product deleteProduct = productService.searchProductById(idDelete);
                     if (deleteProduct == null){
-                        System.err.printf("Sản phẩm có ID là %s không tồn tại.\n",idDelete);
+                        PrintForm.warning("Sản phẩm có ID là "+idDelete+" Không tồn tại");
                     } else {
                         productService.delete(deleteProduct);
-                        System.out.printf("Đã xóa thành công sản phẩm %s.\n",deleteProduct.getName());
+                        PrintForm.success("Đã xóa thành công sản phẩm "+deleteProduct.getName());
                     }
-                    System.out.print("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
+                    PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
                     selection = sc.nextLine();
                 } while (selection.equalsIgnoreCase("Y"));
                 break;
@@ -85,21 +86,29 @@ public class ProductManagement {
                 break;
             case 6:
                 do {
-                    System.out.print("Nhập vào từ khóa bạn muốn tìm kiếm: ");
+                    PrintForm.productMenu("Nhập vào từ khóa bạn muốn tìm kiếm: ");
                     String searchKey = sc.nextLine();
                     List<Product> searchedList = productService.searchAny(searchKey);
                     if (searchedList.isEmpty()){
-                        System.out.printf("Không tìm thấy sản phẩm nào có chứa từ khóa: %s.\n",searchKey);
+                        PrintForm.attention("Không tìm thấy sản phẩm nào có chứa từ khóa: "+searchKey);
                     } else {
+                        PrintForm.printTableF("%5s | %-30s | %17s | %17s | %17s | %-30s | %10s | %s \n",
+                                "Mã sp",
+                                "Tên sản phẩm",
+                                "Giá mua",
+                                "Giá bán",
+                                "Lợi nhuận",
+                                "Mã danh mục",
+                                "Trạng thái",
+                                "Mô tả");
                         searchedList.stream().forEach(Product::displayData);
                     }
-                    System.out.print("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
+                    PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
                     selection = sc.nextLine();
                 } while (selection.equalsIgnoreCase("Y"));
-
                 break;
             default:
-                System.err.println("Lựa chọn không phù hơp");
+                PrintForm.warning("Lựa cho không phù hợp");
         }
     }
 

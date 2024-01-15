@@ -1,7 +1,7 @@
 package WarehouseManagement.Service;
 
-import WarehouseManagement.entity.Category;
-import WarehouseManagement.entity.Product;
+import WarehouseManagement.entity.Model.Category;
+import WarehouseManagement.entity.Model.Product;
 
 import java.util.List;
 import java.util.Map;
