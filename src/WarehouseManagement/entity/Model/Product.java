@@ -44,10 +44,10 @@ public class Product implements IProduct, Serializable {
     }
 
     public void setId(String id) throws ProductException {
-        if (!isValid(id, "P.{3}")) {
-            throw new ProductException("ID phải gồm 4 kí tự, và bắt đầu là P");
+        if (!isValid(id, "P[\\S]{3}")) {
+            throw new ProductException("Mã phải gồm 4 kí tự, bắt đầu là P, và không chứa khoảng trống");
         } else if (isExisted(product -> product.getId().equals(id))) {
-            throw new ProductException("ID đã tồn tại");
+            throw new ProductException("Mã đã tồn tại");
         } else {
             this.id = id;
         }
@@ -60,7 +60,9 @@ public class Product implements IProduct, Serializable {
     public void setName(String name) throws ProductException {
         if (!isValid(name, ".{6,30}")) {
             throw new ProductException("Tên sản phẩm phải từ 6 đến 30 kí tự");
-        } else if (isExisted(p -> p.getName().equals(name))) {
+        } else if (!isValid(name,"[\\S].*")) {
+            throw new ProductException("Tên sản phẩm không được bắt đầu bằng khoảng trống");
+        } else if (isExisted(p -> p.getName().equalsIgnoreCase(name))) {
             throw new ProductException("Tên sản phẩm đã tồn tại");
         } else {
             this.name = name;
@@ -83,7 +85,6 @@ public class Product implements IProduct, Serializable {
             }
         } else {
             this.importPrice = importPrice;
-            calProfit();
         }
     }
 
@@ -148,12 +149,11 @@ public class Product implements IProduct, Serializable {
         }
     }
 
-
     // Phương thức của đối tượng Product
     @Override
     public void inputData(Scanner sc) {
         IProduct.super.inputData(sc);
-        inputIdProduct(sc);
+        inputProductId(sc);
         inputProductName(sc);
         inputImportPrice(sc);
         inputExportPrice(sc);
@@ -162,7 +162,7 @@ public class Product implements IProduct, Serializable {
         inputCategoryId(sc);
     }
 
-    public void inputIdProduct(Scanner sc) {
+    public void inputProductId(Scanner sc) {
         do {
             try {
                 PrintForm.productMenuln("Mời nhập vào ID của sản phẩm: ");
@@ -266,14 +266,14 @@ public class Product implements IProduct, Serializable {
                     categories.stream().sorted(Comparator.comparing(Category::getId))
                                         .filter(Category::isStatus)
                                         .forEach(category -> PrintForm.tableF("%5s | %-30s\n", category.getId(), category.getName()));
-                    PrintForm.tableF("%5s | %-30s\n", "0", "Chưa có danh mục");
+                    /*PrintForm.tableF("%5s | %-30s\n", "0", "Chưa có danh mục");*/
                     PrintForm.productMenu("Chọn mã của danh mục muốn thêm: ");
                     int idCategory = Integer.parseInt(sc.nextLine());
                     setCategoryId(idCategory);
                 }
                 break;
             } catch (NumberFormatException nfe) {
-                PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến " + categories.size());
+                PrintForm.warning("Chỉ được lựa chọn các mã có trong danh sách");
             } catch (ProductException pe) {
                 PrintForm.warning(pe.getMessage());
             }
