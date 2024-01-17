@@ -2,6 +2,7 @@ package WarehouseManagement.Main;
 
 import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.Service.Impl.IOServiceImpl;
+import WarehouseManagement.Service.IOService;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Category;
@@ -12,7 +13,7 @@ import java.util.Scanner;
 
 public class CategoryMenu {
     private static final CategoryServiceImpl categoryService = CategoryServiceImpl.getCategoryServiceInstance();
-    private static final IOServiceImpl<Category> CATEGORY_IO_SERVICE_IMPL = IOServiceImpl.getIoServiceInstance();
+    private static final IOService<Category> categoryIOService = IOServiceImpl.getIoServiceInstance();
     private static final List<Product> products = ProductServiceImpl.getProducts();
 
     public static void displayMenu(Scanner sc) {
@@ -28,7 +29,7 @@ public class CategoryMenu {
             try {
                 int choice = Integer.parseInt(sc.nextLine());
                 if (choice == 6) {
-                    CATEGORY_IO_SERVICE_IMPL.writeToFile(CategoryServiceImpl.getCategories(), categoryService.getPath());
+                    categoryIOService.writeToFile(CategoryServiceImpl.getCategories(), categoryService.getPath());
                     break;
                 } else {
                     switch (choice) {

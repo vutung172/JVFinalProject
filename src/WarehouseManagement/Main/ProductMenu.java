@@ -1,5 +1,6 @@
 package WarehouseManagement.Main;
 
+import WarehouseManagement.Service.IOService;
 import WarehouseManagement.Service.Impl.IOServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.FontConfig.ColorFont;
@@ -11,7 +12,8 @@ import java.util.Scanner;
 
 public class ProductMenu {
     private static final ProductServiceImpl productService = ProductServiceImpl.getProductServiceInstance();
-    private static final IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
+    /*private static final IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();*/
+    private static final IOService<Product> productIOService = IOServiceImpl.getIoServiceInstance();
     public static void displayMenu(Scanner sc){
         do {
             PrintForm.productMenu(ColorFont.BLUE);
@@ -27,7 +29,7 @@ public class ProductMenu {
             try {
                 int choice = Integer.parseInt(sc.nextLine());
                 if (choice == 7){
-                    productIOServiceImpl.writeToFile(ProductServiceImpl.getProducts(),productService.getPath());
+                    productIOService.writeToFile(ProductServiceImpl.getProducts(),productService.getPath());
                     break;
                 } else {
                     switch (choice){

@@ -2,13 +2,14 @@ package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.ProductService;
+import WarehouseManagement.Service.IOService;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Product;
 
 import java.util.*;
 
 public class ProductServiceImpl implements BaseService<Product>, ProductService {
-    private static final IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();
+    private static final IOService<Product> productIOService = IOServiceImpl.getIoServiceInstance();
     private final String fileName = "products.txt";
 
     public String getPath() {
@@ -29,7 +30,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     }
 
     //Singleton cho danh sách category
-    private static List<Product> products = productIOServiceImpl.readFromFile(getProductServiceInstance().getPath());
+    private static List<Product> products = productIOService.readFromFile(getProductServiceInstance().getPath());
 
     public static List<Product> getProducts() {
         if (products == null) {
@@ -46,7 +47,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.add(product);
             PrintForm.success("Thêm sản phẩm thành công");
-            productIOServiceImpl.writeToFile(products,this.fileName);
+            productIOService.writeToFile(products,this.fileName);
         }
     }
 
@@ -115,7 +116,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 } catch (Exception e) {
                     PrintForm.warning(e.getMessage());
                 }
-                productIOServiceImpl.writeToFile(products,this.fileName);
+                productIOService.writeToFile(products,this.fileName);
             } while (true);
         }
     }
@@ -127,7 +128,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             products.remove(product);
             PrintForm.success("Xóa sản phẩm \""+product.getName()+"\" thành công.");
-            productIOServiceImpl.writeToFile(products,this.fileName);
+            productIOService.writeToFile(products,this.fileName);
         }
     }
 

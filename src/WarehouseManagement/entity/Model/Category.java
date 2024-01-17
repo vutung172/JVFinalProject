@@ -5,12 +5,14 @@ import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.ICategory;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Category implements ICategory, Serializable {
+    @Serial
     private static final long serialVersionUID = 20230113202210L;
     private int id;
     private String name;

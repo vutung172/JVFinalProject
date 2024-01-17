@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IOServiceImpl<C> implements IOService<C> {
-    private static IOServiceImpl ioServiceInstance;
+    private static IOService ioServiceInstance;
     private IOServiceImpl() {
     }
-    public static IOServiceImpl getIoServiceInstance(){
+    public static IOService getIoServiceInstance(){
         if (ioServiceInstance == null){
-            ioServiceInstance = new IOServiceImpl();
+            ioServiceInstance = new IOServiceImpl<>();
         }
         return ioServiceInstance;
     }
@@ -55,4 +55,6 @@ public class IOServiceImpl<C> implements IOService<C> {
             PrintForm.warning(ioe.getMessage());
         }
     }
+
+    List<String> string = new ArrayList<>();
 }

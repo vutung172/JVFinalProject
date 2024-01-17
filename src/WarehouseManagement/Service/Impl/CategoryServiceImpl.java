@@ -2,6 +2,7 @@ package WarehouseManagement.Service.Impl;
 
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.CategoryService;
+import WarehouseManagement.Service.IOService;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Category;
 import WarehouseManagement.entity.Model.Product;
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CategoryServiceImpl implements BaseService<Category>, CategoryService {
-    private static IOServiceImpl<Category> categoryIOServiceImpl = IOServiceImpl.getIoServiceInstance();
+    private static IOService<Category> categoryIOService = IOServiceImpl.getIoServiceInstance();
     private final String fileName = "categories.txt";
 
     public String getPath() {
@@ -32,7 +33,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
 
     //Singleton cho danh sách category
-    private static List<Category> categories = categoryIOServiceImpl.readFromFile(getCategoryServiceInstance().getPath());
+    private static List<Category> categories = categoryIOService.readFromFile(getCategoryServiceInstance().getPath());
 
     public static List<Category> getCategories() {
         if (categories == null) {
@@ -47,7 +48,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
             PrintForm.warning("Danh mục "+category.getName()+" đã tồn tại, không thể thêm");
         } else {
             categories.add(category);
-            categoryIOServiceImpl.writeToFile(categories, fileName);
+            categoryIOService.writeToFile(categories, fileName);
             PrintForm.success("Đã thêm danh mục "+category.getName()+" thành công");
         }
     }
@@ -99,7 +100,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
                 } catch (Exception e) {
                     PrintForm.warning(e.getMessage());
                 } finally {
-                    categoryIOServiceImpl.writeToFile(categories, fileName);
+                    categoryIOService.writeToFile(categories, fileName);
                 }
             } while (true);
         }
@@ -117,7 +118,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
             categories.remove(category);
             PrintForm.success("Xóa danh mục "+category.getName()+" thành công");
         }
-        categoryIOServiceImpl.writeToFile(categories, fileName);
+        categoryIOService.writeToFile(categories, fileName);
     }
 
     @Override

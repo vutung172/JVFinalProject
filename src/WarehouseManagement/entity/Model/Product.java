@@ -6,6 +6,7 @@ import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.IProduct;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Product implements IProduct, Serializable {
+    @Serial
     private static final long serialVersionUID = 20230113183502L;
     private String id;
     private String name;
