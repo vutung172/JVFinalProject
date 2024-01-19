@@ -62,8 +62,8 @@ public class Product implements IProduct, Serializable {
     public void setName(String name) throws ProductException {
         if (!isValid(name, ".{6,30}")) {
             throw new ProductException("Tên sản phẩm phải từ 6 đến 30 kí tự");
-        } else if (!isValid(name,"[\\S].*")) {
-            throw new ProductException("Tên sản phẩm không được bắt đầu bằng khoảng trống");
+        } else if (name.trim().isEmpty()) {
+            throw new ProductException("Tên sản phẩm không được bỏ trống");
         } else if (isExisted(p -> p.getName().equalsIgnoreCase(name))) {
             throw new ProductException("Tên sản phẩm đã tồn tại");
         } else {
@@ -287,14 +287,14 @@ public class Product implements IProduct, Serializable {
         IProduct.super.displayData();
         List<Category> categories = CategoryServiceImpl.getCategories();
         Category category = categories.stream().filter(c -> c.getId() == getCategoryId()).findFirst().orElse(null);
-        PrintForm.tableF("%5s | %-30s | %15.2f | %15.2f | %15.2f | %-30s | %10s | %s \n",
+        PrintForm.tableF("%5s | %-30s | %15.2f | %15.2f | %15.2f | %-30s | %17s | %s \n",
                 getId(),
                 getName(),
                 getImportPrice(),
                 getExportPrice(),
                 getProfit(),
                 category != null ? category.getName() : "Chưa có danh mục",
-                isStatus() ? "Đang bán" : "Dừng bán",
+                isStatus() ? "Còn hàng" : "Ngừng kinh doanh",
                 getDescription());
     }
 

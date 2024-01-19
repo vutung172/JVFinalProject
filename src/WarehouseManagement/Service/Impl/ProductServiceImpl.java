@@ -6,7 +6,14 @@ import WarehouseManagement.Service.IOService;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Product;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 
 public class ProductServiceImpl implements BaseService<Product>, ProductService {
     private static final IOService<Product> productIOService = IOServiceImpl.getIoServiceInstance();
@@ -69,10 +76,10 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                         "Mô tả");
                 updateProduct.displayData();
                 PrintForm.productMenuln("1. Cập nhật tên sản phẩm");
-                PrintForm.productMenuln("2. Cập nhật giá bán");
-                PrintForm.productMenuln("3. Cập nhật giá mua");
-                PrintForm.productMenuln("4. Cập nhật mã danh muc của sản phẩm");
-                PrintForm.productMenuln("5. Cập nhật Trạng thái sản phẩm");
+                PrintForm.productMenuln("2. Cập nhật giá mua");
+                PrintForm.productMenuln("3. Cập nhật giá bán");
+                PrintForm.productMenuln("4. Cập nhật mã danh mục của sản phẩm");
+                PrintForm.productMenuln("5. Cập nhật trạng thái sản phẩm");
                 PrintForm.productMenuln("6. Cập nhật mô tả sản phẩm");
                 PrintForm.productMenuln("7. Quay lại");
                 PrintForm.productMenu("Mời bạn lựa chọn : ");
@@ -124,10 +131,10 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     @Override
     public void delete(Product product) {
         if (searchProductById(product.getId()) == null) {
-            PrintForm.warning("Sản phẩm"+product.getName()+"không tồn tại");
+            PrintForm.warning("Sản phẩm "+product.getName()+" không tồn tại");
         } else {
             products.remove(product);
-            PrintForm.success("Xóa sản phẩm \""+product.getName()+"\" thành công.");
+            PrintForm.success("Xóa sản phẩm "+product.getName()+" thành công.");
             productIOService.writeToFile(products,this.fileName);
         }
     }
@@ -139,7 +146,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             switch (sortType) {
                 case "ASC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -151,7 +158,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                     products.stream().sorted(Comparator.comparing(Product::getName)).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -175,7 +182,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             switch (sortType) {
                 case "ASC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -187,7 +194,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                     products.stream().sorted(Comparator.comparing(Product::getProfit)).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -218,7 +225,6 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
             currentCategoryMap.put(0, "Chưa có danh mục");
         }
         categoryService.searchCategoryByName(key).stream().forEach(category -> currentCategoryMap.put(category.getId(), category.getName()));
-        //Tìm kiếm trong trạng thái
 
         switch (checkType) {
             case "INTEGER":
@@ -275,10 +281,10 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 products.stream().filter(p4 -> currentCategoryMap.containsKey(p4.getCategoryId()))
                         .forEach(p4 -> idFoundList3.add(p4.getId()));
                 //tìm theo trạng thái
-                if("đang bán".contains(key)){
+                if("còn hàng".contains(key)){
                     products.stream().filter(Product::isStatus).forEach(p5 -> idFoundList3.add(p5.getId()));
                 }
-                if ("dừng bán".contains(key)) {
+                if ("ngừng kinh doanh".contains(key)) {
                     products.stream().filter(p6 -> !p6.isStatus()).forEach(p6 -> idFoundList3.add(p6.getId()));
                 }
 

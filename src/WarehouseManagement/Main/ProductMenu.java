@@ -7,6 +7,7 @@ import WarehouseManagement.entity.FontConfig.ColorFont;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Product;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -60,15 +61,15 @@ public class ProductMenu {
                         case 3:
                             do {
                                 PrintForm.productMenuln("Nhập vào ID của sản phẩm muốn xóa: ");
-                                String idDelete = sc.next();
+                                String idDelete = sc.nextLine();
                                 Product deleteProduct = productService.searchProductById(idDelete);
                                 if (deleteProduct == null){
-                                    PrintForm.warning("Sản phẩm có ID là "+idDelete+" Không tồn tại");
+                                    PrintForm.warning("Sản phẩm có ID là "+idDelete+" không tồn tại");
                                 } else {
                                     productService.delete(deleteProduct);
                                     PrintForm.success("Đã xóa thành công sản phẩm "+deleteProduct.getName());
                                 }
-                                PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
+                                PrintForm.productMenu("Bạn có muốn tiếp tục xóa sản phẩm khác không (Y/N): ");
                                 selection = sc.nextLine();
                             } while (selection.equalsIgnoreCase("Y"));
                             break;
@@ -86,7 +87,7 @@ public class ProductMenu {
                                 if (searchedList.isEmpty()){
                                     PrintForm.attention("Không tìm thấy sản phẩm nào có chứa từ khóa: "+searchKey);
                                 } else {
-                                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %10s | %s \n",
+                                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
                                             "Mã sp",
                                             "Tên sản phẩm",
                                             "Giá mua (USD)",
@@ -95,7 +96,7 @@ public class ProductMenu {
                                             "Danh mục sản phẩm",
                                             "Trạng thái",
                                             "Mô tả");
-                                    searchedList.stream().forEach(Product::displayData);
+                                    searchedList.stream().sorted(Comparator.comparing(Product::getId)).forEach(Product::displayData);
                                 }
                                 PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
                                 selection = sc.nextLine();

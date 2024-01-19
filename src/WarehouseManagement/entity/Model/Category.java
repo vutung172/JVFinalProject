@@ -60,6 +60,8 @@ public class Category implements ICategory, Serializable {
             throw new CategoryException("Tên danh mục đã tồn tại");
         } else if (!isValid(name,".{6,30}")){
             throw new CategoryException("Tên danh mục phải từ 6 đến 30 kí tự");
+        } else if(name.trim().isEmpty()){
+            throw new CategoryException("Phải nhập tên danh mục");
         } else {
             this.name = name;
         }
@@ -137,7 +139,7 @@ public class Category implements ICategory, Serializable {
             try{
                 PrintForm.categoryMenuln("Mời nhập vào trạng thái: ");
                 PrintForm.categoryMenuln("1. Hoạt động");
-                PrintForm.categoryMenuln("2. Tạm dừng");
+                PrintForm.categoryMenuln("2. Không hoạt động");
                 System.out.print("Mời chọn lựa trạng thái: ");
                 int status = Integer.parseInt(sc.nextLine());
                 if(status == 1){
@@ -157,10 +159,10 @@ public class Category implements ICategory, Serializable {
 
     @Override
     public void displayData() {
-        PrintForm.tableF("%5s | %-30s | %15s |%s |\n",
+        PrintForm.tableF("%5s | %-30s | %15s | %s \n",
                 getId(),
                 getName(),
-                isStatus()?"Hoạt động":"Tạm dừng",
+                isStatus()?"Hoạt động":"Không hoạt động",
                 getDescription());
     }
 

@@ -113,7 +113,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
         if (searchCategoryById(category.getId()) == null) {
             PrintForm.warning("Danh mục "+category.getName()+" không tồn tại, không thể xóa");
         } else if (count != 0) {
-            PrintForm.warning("Danh mục "+category.getName()+" đã có "+count+" sản phẩm, không thể xóa");
+            PrintForm.warning("Danh mục "+category.getName()+" đang có "+count+" sản phẩm tham chiếu, không thể xóa");
         } else {
             categories.remove(category);
             PrintForm.success("Xóa danh mục "+category.getName()+" thành công");
@@ -124,14 +124,15 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
     @Override
     public List<Category> searchCategoryByName(String name) {
         return categories.stream().filter(c -> c.getName().toLowerCase().contains(name.toLowerCase()))
+                .sorted(Comparator.comparing(Category::getId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Map<String, Long> synthesizeCategoryByProductQuantity(List<Product> products) {
-        Map<Integer, Long> productCountByCategory = products.stream()
-                                                            .collect(Collectors.groupingBy(Product::getCategoryId, Collectors.counting()));
-        return categories.stream().collect(Collectors.toMap(Category::getName, c -> productCountByCategory.getOrDefault(c.getId(), 0L)));
+        Map<Integer, Long> productCountByCategory = products.stream().collect(Collectors.groupingBy(Product::getCategoryId, Collectors.counting()));
+        return categories.stream().collect(Collectors.toMap(Category::getName, c -> productCountByCategory.getOrDefault(c.getId(), 0L)))
+                                    .entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(e1,e2) -> e1,LinkedHashMap::new));
     }
 
     public Category searchCategoryById(int id) {

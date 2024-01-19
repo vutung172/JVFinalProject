@@ -87,7 +87,7 @@ public class CategoryMenu {
                                 if (searchedList.isEmpty()){
                                     PrintForm.attention("Không tìm thấy sản phẩm nào có từ khóa chứa: "+ searchKey);
                                 } else {
-                                    PrintForm.tableHeaderF("%5s | %-30s | %15s |%s |\n","Mã","Tên danh mục","Trạng thái","Mô tả");
+                                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %s \n","Mã","Tên danh mục","Trạng thái","Mô tả");
                                     searchedList.forEach(Category::displayData);
                                 }
                                 PrintForm.categoryMenu("Bạn có muốn tiếp tục tìm kiếm sản phẩm khác không (Y/N):");
@@ -95,7 +95,7 @@ public class CategoryMenu {
                             } while (selection.equalsIgnoreCase("Y"));
                             break;
                         case 5:
-                            PrintForm.tableF("%30s | %-15s \n","Tên danh mục","Số sản phẩm");
+                            PrintForm.tableHeaderF("%30s | %-15s \n","Tên danh mục","Số sản phẩm");
                             categoryService.synthesizeCategoryByProductQuantity(products).forEach((k,v) -> PrintForm.tableF("%30s | %-15s \n",k,v));
                             break;
                         default:
