@@ -1,9 +1,11 @@
 package WarehouseManagement.Service.Impl;
 
+import WarehouseManagement.Exception.ProductException;
 import WarehouseManagement.Service.BaseService;
 import WarehouseManagement.Service.ProductService;
 import WarehouseManagement.Service.IOService;
 import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.Model.Category;
 import WarehouseManagement.entity.Model.Product;
 
 import java.util.ArrayList;
@@ -146,7 +148,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         } else {
             switch (sortType) {
                 case "ASC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -154,11 +156,12 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                             "Lợi nhuận (USD)",
                             "Danh mục sản phẩm",
                             "Trạng thái",
+                            "Số lượng",
                             "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getName)).forEach(Product::displayData);
                     break;
                 case "DESC":
-                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
+                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %10s | %s \n",
                             "Mã sp",
                             "Tên sản phẩm",
                             "Giá mua (USD)",
@@ -166,6 +169,7 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                             "Lợi nhuận (USD)",
                             "Danh mục sản phẩm",
                             "Trạng thái",
+                            "Số lượng",
                             "Mô tả");
                     products.stream().sorted(Comparator.comparing(Product::getName).reversed()).forEach(Product::displayData);
                     break;
@@ -218,9 +222,9 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
 
         List<Product> searchAnyList = new ArrayList<>();
 
-        //Tìm kiếm trong danh mục
         CategoryServiceImpl categoryService = CategoryServiceImpl.getCategoryServiceInstance();
         Map<Integer,String> currentCategoryMap = new HashMap<>();
+        //Tìm kiếm trong danh mục
         if ("chưa có danh mục".contains(key)) {
             currentCategoryMap.put(0, "Chưa có danh mục");
         }
@@ -315,6 +319,30 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 return "STRING";
             }
         }
+    }
+
+    public void importWarehouse(Scanner sc,String productId, int categoryId, int quantity){
+        Product importProduct = products.stream().filter(p -> p.getId().equals(productId)).findFirst().orElse(null);
+        Category importCategory = CategoryServiceImpl.getCategories().stream().filter(c -> c.getId() == categoryId).findFirst().orElse(null);
+        if (importProduct != null && importCategory != null){
+            try {
+                importProduct.setQuantity(importProduct.getQuantity()+quantity);
+                PrintForm.success("Nhập kho thành công");
+            } catch (ProductException pe){
+                PrintForm.warning(pe.getMessage());
+            }
+        } else {
+            if (importProduct == null) {
+                PrintForm.attention("Hiện chưa có sản phẩm với id là: " + productId + ", yêu cầu thêm mới");
+                importProduct.inputData(sc);
+            }
+            if (importCategory == null) {
+                PrintForm.attention("Hiện có danh mục có id là " + categoryId + ", yêu cầu thêm mới");
+                importProduct.inputCategoryId(sc);
+            }
+            PrintForm.success("Nhập kho thành công");
+        }
+        productIOService.writeToFile(products,this.fileName);
     }
 
 }

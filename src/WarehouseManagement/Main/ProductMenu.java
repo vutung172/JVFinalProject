@@ -1,10 +1,13 @@
 package WarehouseManagement.Main;
 
+import WarehouseManagement.Exception.ProductException;
 import WarehouseManagement.Service.IOService;
+import WarehouseManagement.Service.Impl.CategoryServiceImpl;
 import WarehouseManagement.Service.Impl.IOServiceImpl;
 import WarehouseManagement.Service.Impl.ProductServiceImpl;
 import WarehouseManagement.entity.FontConfig.ColorFont;
 import WarehouseManagement.entity.FontConfig.PrintForm;
+import WarehouseManagement.entity.Model.Category;
 import WarehouseManagement.entity.Model.Product;
 
 import java.util.Comparator;
@@ -13,8 +16,9 @@ import java.util.Scanner;
 
 public class ProductMenu {
     private static final ProductServiceImpl productService = ProductServiceImpl.getProductServiceInstance();
-    /*private static final IOServiceImpl<Product> productIOServiceImpl = IOServiceImpl.getIoServiceInstance();*/
+    private static final CategoryServiceImpl categoryService = CategoryServiceImpl.getCategoryServiceInstance();
     private static final IOService<Product> productIOService = IOServiceImpl.getIoServiceInstance();
+    private static final IOService<Category> categoryIOService = IOServiceImpl.getIoServiceInstance();
     public static void displayMenu(Scanner sc){
         do {
             PrintForm.productMenu(ColorFont.BLUE);
@@ -25,11 +29,12 @@ public class ProductMenu {
             PrintForm.productMenuln("4. Hiển thị sản phẩm theo tên A-Z");
             PrintForm.productMenuln("5. Hiển thị sản phẩm theo lợi nhuận từ cao-thấp");
             PrintForm.productMenuln("6. Tìm kiếm sản phẩm");
-            PrintForm.productMenuln("7. Quay lại");
+            PrintForm.productMenuln("7. Nhập kho");
+            PrintForm.productMenuln("8. Quay lại");
             PrintForm.productMenu("Mời nhập lựa chọn của bạn: ");
             try {
                 int choice = Integer.parseInt(sc.nextLine());
-                if (choice == 7){
+                if (choice == 8){
                     productIOService.writeToFile(ProductServiceImpl.getProducts(),productService.getPath());
                     break;
                 } else {
@@ -99,6 +104,85 @@ public class ProductMenu {
                                     searchedList.stream().sorted(Comparator.comparing(Product::getId)).forEach(Product::displayData);
                                 }
                                 PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
+                                selection = sc.nextLine();
+                            } while (selection.equalsIgnoreCase("Y"));
+                            break;
+                        case 7:
+                            do {
+                                PrintForm.productMenuln("Mời nhập vào tên sản phẩm: ");
+                                String productName = sc.nextLine();
+                                PrintForm.productMenuln("Mời nhập vào tên danh mục: ");
+                                String categoryName = sc.nextLine();
+                                PrintForm.productMenuln("Mời nhập vào số lượng sản phẩm: ");
+                                int quantity = Integer.parseInt(sc.nextLine());
+                                List<Product> foundProduct = productService.searchAny(productName);
+                                List<Category> foundCategory = categoryService.searchCategoryByName(categoryName);
+                                if (!foundProduct.isEmpty() && !foundCategory.isEmpty()){
+                                    PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
+                                            "Mã sp",
+                                            "Tên sản phẩm",
+                                            "Giá mua (USD)",
+                                            "Giá bán (USD)",
+                                            "Lợi nhuận (USD)",
+                                            "Danh mục sản phẩm",
+                                            "Trạng thái",
+                                            "Mô tả");
+                                    foundProduct.stream().filter(p -> foundCategory.stream().anyMatch(c -> c.getId() == p.getCategoryId())).forEach(Product::displayData);
+                                    PrintForm.productMenuln("Chọn mã sản phẩm bạn muốn nhập kho: ");
+                                    String idImport = sc.nextLine();
+                                    Product product = productService.searchProductById(idImport);
+                                    productService.importWarehouse(sc,idImport,product.getCategoryId(),quantity);
+                                } else {
+                                    if (foundProduct.isEmpty() && foundCategory.isEmpty()){
+                                        PrintForm.warning("Sản phẩm và danh mục chưa tồn tại, yêu cầu nhập mới.");
+                                        Category category = new Category();
+                                        Product product = new Product();
+
+                                        category.inputData(sc);
+                                        CategoryServiceImpl.getCategories().add(category);
+                                        product.inputData(sc);
+                                        ProductServiceImpl.getProducts().add(product);
+
+                                        productService.importWarehouse(sc,product.getId(),product.getCategoryId(),0);
+                                    } else {
+                                        if (!foundCategory.isEmpty()) {
+                                            PrintForm.attention("Sản phẩm chưa tồn tại, yêu cầu thêm mới: ");
+                                            Product product = new Product();
+                                            product.inputData(sc);
+                                            ProductServiceImpl.getProducts().add(product);
+                                            productService.importWarehouse(sc,product.getId(), product.getCategoryId(),0);
+                                        }
+                                        if (!foundProduct.isEmpty()) {
+                                            try {
+                                                PrintForm.attention("Danh mục chưa tồn tại, yêu cầu thêm mới: ");
+                                                Category category = new Category();
+                                                category.inputData(sc);
+                                                categoryService.add(category);
+
+                                                PrintForm.tableHeaderF("%5s | %-30s | %15s | %15s | %15s | %-30s | %17s | %s \n",
+                                                        "Mã sp",
+                                                        "Tên sản phẩm",
+                                                        "Giá mua (USD)",
+                                                        "Giá bán (USD)",
+                                                        "Lợi nhuận (USD)",
+                                                        "Danh mục sản phẩm",
+                                                        "Trạng thái",
+                                                        "Mô tả");
+                                                foundProduct.stream().forEach(Product::displayData);
+                                                PrintForm.productMenuln("Chọn mã sản phẩm bạn muốn nhập kho: ");
+                                                String idImport = sc.nextLine();
+
+                                                Product product = productService.searchProductById(idImport);
+                                                product.setCategoryId(category.getId());
+                                                productService.importWarehouse(sc,product.getId(), category.getId(), quantity);
+                                            } catch (ProductException pe) {
+                                                PrintForm.warning(pe.getMessage());
+                                            }
+                                        }
+                                    }
+                                }
+                                categoryIOService.writeToFile(CategoryServiceImpl.getCategories(),categoryService.getPath());
+                                PrintForm.productMenu("Bạn có muốn tiếp tục nhập kho sản phẩm khác không (Y/N):");
                                 selection = sc.nextLine();
                             } while (selection.equalsIgnoreCase("Y"));
                             break;

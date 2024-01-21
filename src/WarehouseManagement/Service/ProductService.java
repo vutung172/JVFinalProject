@@ -8,5 +8,4 @@ public interface ProductService {
     void displaySortedDataByName(String sortType);
     void displaySortedDataByProfit(String sortType);
     List<Product> searchAny(String searchKey);
-
 }

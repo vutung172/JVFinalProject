@@ -26,6 +26,7 @@ public class Product implements IProduct, Serializable {
     private String description;
     private boolean status;
     private int categoryId;
+    private int quantity;
 
     public Product() {
     }
@@ -151,12 +152,23 @@ public class Product implements IProduct, Serializable {
         }
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) throws ProductException{
+        if(quantity <= 0) {
+            throw new ProductException("Số lượng phải lớn hơn 0");
+        }else {this.quantity = quantity;}
+    }
+
     // Phương thức của đối tượng Product
     @Override
     public void inputData(Scanner sc) {
         IProduct.super.inputData(sc);
         inputProductId(sc);
         inputProductName(sc);
+        inputQuantity(sc);
         inputImportPrice(sc);
         inputExportPrice(sc);
         inputProductDescription(sc);
@@ -241,11 +253,11 @@ public class Product implements IProduct, Serializable {
                 PrintForm.productMenuln("1. Đang bán");
                 PrintForm.productMenuln("2. Dừng bán");
                 PrintForm.productMenu("Mời chọn lựa chọn trạng thái: ");
-                int statusProduct = Integer.parseInt(sc.nextLine());
-                if (statusProduct == 1) {
+                float statusProduct = Float.parseFloat(sc.nextLine());
+                if (statusProduct == 1F) {
                     setStatus(true);
                     break;
-                } else if (statusProduct == 2) {
+                } else if (statusProduct == 2F) {
                     setStatus(false);
                     break;
                 } else {
@@ -281,13 +293,27 @@ public class Product implements IProduct, Serializable {
             }
         } while (true);
     }
+    public void inputQuantity(Scanner sc){
+        do {
+            try{
+                PrintForm.productMenuln("Nhập vào số lượng sản phẩm: ");
+                int productQuantity = Integer.parseInt(sc.nextLine());
+                setQuantity(productQuantity);
+                break;
+            }catch (NumberFormatException nfe){
+                PrintForm.warning(nfe.getMessage());
+            } catch (ProductException pe){
+                PrintForm.warning(pe.getMessage());
+            }
+        }while (true);
+    }
 
     @Override
     public void displayData() {
         IProduct.super.displayData();
         List<Category> categories = CategoryServiceImpl.getCategories();
         Category category = categories.stream().filter(c -> c.getId() == getCategoryId()).findFirst().orElse(null);
-        PrintForm.tableF("%5s | %-30s | %15.2f | %15.2f | %15.2f | %-30s | %17s | %s \n",
+        PrintForm.tableF("%5s | %-30s | %15.2f | %15.2f | %15.2f | %-30s | %17s | %10d | %s \n",
                 getId(),
                 getName(),
                 getImportPrice(),
@@ -295,6 +321,7 @@ public class Product implements IProduct, Serializable {
                 getProfit(),
                 category != null ? category.getName() : "Chưa có danh mục",
                 isStatus() ? "Còn hàng" : "Ngừng kinh doanh",
+                getQuantity(),
                 getDescription());
     }
 

@@ -108,8 +108,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
     @Override
     public void delete(Category category) {
-        List<Product> products = ProductServiceImpl.getProducts();
-        long count = products.stream().filter(p -> p.getCategoryId() == category.getId()).count();
+        long count = ProductServiceImpl.getProducts().stream().filter(p -> p.getCategoryId() == category.getId()).count();
         if (searchCategoryById(category.getId()) == null) {
             PrintForm.warning("Danh mục "+category.getName()+" không tồn tại, không thể xóa");
         } else if (count != 0) {
