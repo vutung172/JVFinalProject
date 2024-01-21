@@ -40,16 +40,17 @@ public class ProductMenu {
                 } else {
                     switch (choice){
                         case 1:
-                            String selection;
+                            String selection1;
                             do {
                                 Product product = new Product();
                                 product.inputData(sc);
                                 productService.add(product);
                                 PrintForm.productMenu("Bạn có muốn tiếp tục thêm sản phẩm không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection1 = sc.nextLine();
+                            } while (selection1.equalsIgnoreCase("Y"));
                             break;
                         case 2:
+                            String selection2;
                             do {
                                 PrintForm.productMenuln("Nhập vào ID muốn cập nhật: ");
                                 String idUpdate = sc.nextLine();
@@ -60,10 +61,11 @@ public class ProductMenu {
                                     productService.update(sc,updateProduct);
                                 }
                                 PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection2 = sc.nextLine();
+                            } while (selection2.equalsIgnoreCase("Y"));
                             break;
                         case 3:
+                            String selection3;
                             do {
                                 PrintForm.productMenuln("Nhập vào ID của sản phẩm muốn xóa: ");
                                 String idDelete = sc.nextLine();
@@ -75,8 +77,8 @@ public class ProductMenu {
                                     PrintForm.success("Đã xóa thành công sản phẩm "+deleteProduct.getName());
                                 }
                                 PrintForm.productMenu("Bạn có muốn tiếp tục xóa sản phẩm khác không (Y/N): ");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection3 = sc.nextLine();
+                            } while (selection3.equalsIgnoreCase("Y"));
                             break;
                         case 4:
                             productService.displaySortedDataByName("ASC");
@@ -85,6 +87,7 @@ public class ProductMenu {
                             productService.displaySortedDataByProfit("DESC");
                             break;
                         case 6:
+                            String selection6;
                             do {
                                 PrintForm.productMenu("Nhập vào từ khóa bạn muốn tìm kiếm: ");
                                 String searchKey = sc.nextLine();
@@ -104,10 +107,11 @@ public class ProductMenu {
                                     searchedList.stream().sorted(Comparator.comparing(Product::getId)).forEach(Product::displayData);
                                 }
                                 PrintForm.productMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection6 = sc.nextLine();
+                            } while (selection6.equalsIgnoreCase("Y"));
                             break;
                         case 7:
+                            String selection7;
                             do {
                                 PrintForm.productMenuln("Mời nhập vào tên sản phẩm: ");
                                 String productName = sc.nextLine();
@@ -182,9 +186,10 @@ public class ProductMenu {
                                     }
                                 }
                                 categoryIOService.writeToFile(CategoryServiceImpl.getCategories(),categoryService.getPath());
-                                PrintForm.productMenu("Bạn có muốn tiếp tục nhập kho sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+
+                                PrintForm.productMenu("Bạn có muốn tiếp tục nhập kho sản phẩm khác không (Y/N): ");
+                                selection7 = sc.nextLine();
+                            } while (selection7.equalsIgnoreCase("Y"));
                             break;
                         default:
                             PrintForm.warning("Lựa cho không phù hợp");

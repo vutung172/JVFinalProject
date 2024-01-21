@@ -34,16 +34,17 @@ public class CategoryMenu {
                 } else {
                     switch (choice) {
                         case 1:
-                            String selection;
+                            String selection11;
                             do {
                                 Category category = new Category();
                                 category.inputData(sc);
                                 categoryService.add(category);
                                 PrintForm.categoryMenu("Bạn có muốn tiếp tục thêm sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection11 = sc.nextLine();
+                            } while (selection11.equalsIgnoreCase("Y"));
                             break;
                         case 2:
+                            String selection12;
                             do {
                                 try{
                                     PrintForm.categoryMenuln("Nhập vào mã của danh mục muốn cập nhật: ");
@@ -58,10 +59,11 @@ public class CategoryMenu {
                                     PrintForm.warning(nfe.getMessage());
                                 }
                                 PrintForm.categoryMenu("Bạn có muốn tiếp tục cập nhật sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection12 = sc.nextLine();
+                            } while (selection12.equalsIgnoreCase("Y"));
                             break;
                         case 3:
+                            String selection13;
                             do {
                                 try{
                                     PrintForm.categoryMenuln("Nhập vào mã của danh mục muốn xóa: ");
@@ -76,10 +78,11 @@ public class CategoryMenu {
                                     PrintForm.warning(nfe.getMessage());
                                 }
                                 PrintForm.categoryMenu("Bạn có muốn tiếp tục xóa sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection13 = sc.nextLine();
+                            } while (selection13.equalsIgnoreCase("Y"));
                             break;
                         case 4:
+                            String selection14;
                             do {
                                 PrintForm.categoryMenuln("Nhập vào tên của danh mục muốn tìm kiếm: ");
                                 String searchKey = sc.nextLine();
@@ -91,8 +94,8 @@ public class CategoryMenu {
                                     searchedList.forEach(Category::displayData);
                                 }
                                 PrintForm.categoryMenu("Bạn có muốn tiếp tục tìm kiếm sản phẩm khác không (Y/N):");
-                                selection = sc.nextLine();
-                            } while (selection.equalsIgnoreCase("Y"));
+                                selection14 = sc.nextLine();
+                            } while (selection14.equalsIgnoreCase("Y"));
                             break;
                         case 5:
                             PrintForm.tableHeaderF("%30s | %-15s \n","Tên danh mục","Số sản phẩm");
