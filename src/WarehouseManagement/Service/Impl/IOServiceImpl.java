@@ -28,7 +28,7 @@ public class IOServiceImpl<C> implements IOService<C> {
     public List<C> readFromFile(String path) {
         List<C> list = new ArrayList<>();
         try {
-            File file = new File("C:\\Users\\TungV\\IdeaProjects\\FinalProject\\src\\WarehouseManagement\\Database\\" + path);
+            File file = new File("G:\\GG Driver\\02. Academy\\Rikei\\Full-stack course\\02. Projects\\06.Final project\\Module3\\FinalProject\\src\\WarehouseManagement\\Database\\File\\" + path);
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
             list = (List<C>) ois.readObject();
@@ -48,7 +48,7 @@ public class IOServiceImpl<C> implements IOService<C> {
     @Override
     public void writeToFile(List<C> list, String path) {
         try {
-            File file = new File("C:\\Users\\TungV\\IdeaProjects\\FinalProject\\src\\WarehouseManagement\\Database\\" + path);
+            File file = new File("G:\\GG Driver\\02. Academy\\Rikei\\Full-stack course\\02. Projects\\06.Final project\\Module3\\FinalProject\\src\\WarehouseManagement\\Database\\File\\" + path);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(list);
@@ -62,5 +62,4 @@ public class IOServiceImpl<C> implements IOService<C> {
         }
     }
 
-    List<String> string = new ArrayList<>();
 }
