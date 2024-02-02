@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
 
     //Singleton cho class CategoryService
     private static CategoryServiceImpl categoryServiceInstance;
-    private static List<Category> categories;
+    private static List<Category> categories ;
 
     private CategoryServiceImpl() {
         categories = downloadFromDb();
@@ -49,13 +49,13 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
         if (searchCategoryById(category.getId()) != null) {
             PrintForm.warning("Danh mục " + category.getName() + " đã tồn tại, không thể thêm");
         } else {
-            Connection conn = null;
+            Connection connection = null;
             try {
                 // B1. Tạo kết nối
-                conn = MySQLConnect.open();
+                connection = MySQLConnect.open();
                 // B2. Tạo đối tượng thực thi câu truy vấn
                 String query = "INSERT INTO categories(name,description,status) VALUES(?,?,?)";
-                PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
                 // B2.1: Truyền tham số nếu có
                 ps.setString(1, category.getName());
                 ps.setString(2, category.getDescription());
@@ -75,7 +75,7 @@ public class CategoryServiceImpl implements BaseService<Category>, CategoryServi
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
-                MySQLConnect.close(conn);
+                MySQLConnect.close(connection);
             }
         }
     }

@@ -1,13 +1,16 @@
 package WarehouseManagement.Service.Impl;
 
+import WarehouseManagement.Database.MySQL.MySQLConnect;
 import WarehouseManagement.Exception.ProductException;
 import WarehouseManagement.Service.BaseService;
+import WarehouseManagement.Service.DbService;
 import WarehouseManagement.Service.ProductService;
 import WarehouseManagement.Service.IOService;
 import WarehouseManagement.entity.FontConfig.PrintForm;
 import WarehouseManagement.entity.Model.Category;
 import WarehouseManagement.entity.Model.Product;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,7 +20,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-public class ProductServiceImpl implements BaseService<Product>, ProductService {
+public class ProductServiceImpl implements BaseService<Product>, ProductService, DbService<Product> {
     private static final IOService<Product> productIOService = IOServiceImpl.getIoServiceInstance();
     private final String fileName = "products.txt";
 
@@ -27,8 +30,10 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
 
     //Singleton cho class CategoryService
     private static ProductServiceImpl productServiceInstance;
+    private static List<Product> products;
 
     private ProductServiceImpl() {
+        products = downloadFromDb();
     }
 
     public static ProductServiceImpl getProductServiceInstance() {
@@ -39,7 +44,6 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
     }
 
     //Singleton cho danh sách category
-    private static List<Product> products = productIOService.readFromFile(getProductServiceInstance().getPath());
 
     public static List<Product> getProducts() {
         if (products == null) {
@@ -54,8 +58,32 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         if (searchProductById(product.getId()) != null) {
             PrintForm.warning("Sản phẩm"+product.getName()+"đã tồn tại, không thể thêm");
         } else {
-            products.add(product);
-            PrintForm.success("Thêm sản phẩm thành công");
+            Connection connection = MySQLConnect.open();
+            try {
+                connection = MySQLConnect.open();
+                // B2. Tạo đối tượng thực thi câu truy vấn
+                String query = "INSERT INTO products (id,name,importPrice,exportPrice,profit,description,status,categoryId,quantity) VALUES (?,?,?,?,?,?,?,?,?)";
+                PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                // B2.1: Truyền tham số nếu có
+                ps.setString(1, product.getId());
+                ps.setString(2, product.getName());
+                ps.setDouble(3, product.getImportPrice());
+                ps.setDouble(4, product.getExportPrice());
+                ps.setDouble(5, product.getProfit());
+                ps.setString(6, product.getDescription());
+                ps.setBoolean(7, product.isStatus());
+                ps.setInt(8, product.getCategoryId());
+                ps.setInt(9, product.getQuantity());
+                // B3. Thực thi câu truy vấn
+                int result = ps.executeUpdate();
+                if (result > 0) {
+                    products.add(product);
+                    PrintForm.success("Đã thêm sản phẩm " +product.getName() + " thành công");
+                    PrintForm.success("Upload sản phẩm " + product.getName() + " thành công lên database");
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             productIOService.writeToFile(products,this.fileName);
         }
     }
@@ -85,45 +113,87 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
                 PrintForm.productMenuln("6. Cập nhật mô tả sản phẩm");
                 PrintForm.productMenuln("7. Quay lại");
                 PrintForm.productMenu("Mời bạn lựa chọn : ");
+                Connection connection = null;
                 try {
+                    connection = MySQLConnect.open();
                     int choice = Integer.parseInt(sc.nextLine());
+                    int result;
+                    PreparedStatement ps;
                     if (choice == 7) {
                         break;
                     } else {
                         switch (choice) {
                             case 1:
                                 updateProduct.inputProductName(sc);
-                                PrintForm.success("Cập nhật thành công tên cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateNameQuery = "UPDATE products SET name = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateNameQuery);
+                                ps.setString(1,updateProduct.getName());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công tên cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 2:
                                 updateProduct.inputImportPrice(sc);
-                                PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateImportPriceQuery = "UPDATE products SET importPrice = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateImportPriceQuery);
+                                ps.setDouble(1,updateProduct.getImportPrice());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công giá mua cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 3:
                                 updateProduct.inputExportPrice(sc);
-                                PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateExportPriceQuery = "UPDATE products SET exportPrice = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateExportPriceQuery);
+                                ps.setDouble(1,updateProduct.getExportPrice());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công giá bán cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 4:
                                 updateProduct.inputCategoryId(sc);
-                                PrintForm.success("Cập nhật thành công danh mục cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateCategoryIdQuery = "UPDATE products SET categoryId = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateCategoryIdQuery);
+                                ps.setInt(1,updateProduct.getCategoryId());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công danh mục cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 5:
                                 updateProduct.inputStatus(sc);
-                                PrintForm.success("Cập nhật thành công trạng thái cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateStatusQuery = "UPDATE products SET status = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateStatusQuery);
+                                ps.setBoolean(1,updateProduct.isStatus());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công trạng thái cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             case 6:
                                 updateProduct.inputProductDescription(sc);
-                                PrintForm.success("Cập nhật thành công mô tả cho sản phẩm có ID là: "+updateProduct.getId());
+                                String updateDesciptionQuery = "UPDATE products SET description = ? WHERE id = ?";
+                                ps = connection.prepareStatement(updateDesciptionQuery);
+                                ps.setNString(1,updateProduct.getDescription());
+                                ps.setString(2,updateProduct.getId());
+                                result = ps.executeUpdate();
+                                if (result > 0)
+                                    PrintForm.success("Cập nhật thành công mô tả cho sản phẩm có ID là: "+updateProduct.getId());
                                 break;
                             default:
                                 PrintForm.warning("Lựa chọn không phù hợp");
                         }
 
                     }
+                    connection.close();
                 } catch (NumberFormatException nfe) {
                     PrintForm.warning("Lựa chọn phải là số nguyên từ 1 đến 7");
                 } catch (Exception e) {
                     PrintForm.warning(e.getMessage());
+                    e.printStackTrace();
                 }
                 productIOService.writeToFile(products,this.fileName);
             } while (true);
@@ -135,8 +205,20 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
         if (searchProductById(product.getId()) == null) {
             PrintForm.warning("Sản phẩm "+product.getName()+" không tồn tại");
         } else {
-            products.remove(product);
-            PrintForm.success("Xóa sản phẩm "+product.getName()+" thành công.");
+            Connection connection = null;
+            try{
+                connection = MySQLConnect.open();
+                String deleteProductQuery = "DELETE FROM products WHERE id = ?";
+                PreparedStatement ps = connection.prepareStatement(deleteProductQuery);
+                ps.setNString(1,product.getId());
+                int result = ps.executeUpdate();
+                if (result > 0){
+                    products.remove(product);
+                    PrintForm.success("Xóa sản phẩm "+product.getName()+" thành công.");
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             productIOService.writeToFile(products,this.fileName);
         }
     }
@@ -343,6 +425,71 @@ public class ProductServiceImpl implements BaseService<Product>, ProductService 
             PrintForm.success("Nhập kho thành công");
         }
         productIOService.writeToFile(products,this.fileName);
+    }
+
+    @Override
+    public List<Product> downloadFromDb() {
+        List<Product> dbProducts = new ArrayList<>();
+        Connection connection = MySQLConnect.open();
+        if (connection != null) {
+            try {
+                String dbQuery = "SELECT * FROM products";
+                PreparedStatement ps = connection.prepareStatement(dbQuery);
+                ResultSet resultSet = ps.executeQuery();
+                while (resultSet.next()) {
+                    Product product = new Product();
+                    product.setId(resultSet.getNString("id"));
+                    product.setName(resultSet.getNString("name"));
+                    product.setImportPrice(resultSet.getDouble("importPrice"));
+                    product.setExportPrice(resultSet.getDouble("exportPrice"));
+                    product.setDescription(resultSet.getNString("description"));
+                    product.setStatus(resultSet.getBoolean("status"));
+                    product.setCategoryId(resultSet.getInt("categoryId"));
+                    product.setQuantity(resultSet.getInt("quantity"));
+                    dbProducts.add(product);
+                }
+                PrintForm.success("download db success");
+                productIOService.writeToFile(products, getPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                MySQLConnect.close(connection);
+            }
+        }
+        return dbProducts;
+    }
+
+    @Override
+    public void uploadAllToDb() {
+        Connection connection = MySQLConnect.open();
+        try {
+            String uploadProductQuery = "INSERT INTO products (id,name,importPrice,exportPrice,profit,description,status,categoryId,quantity) VALUES (?,?,?,?,?,?,?,?,?)";
+            PreparedStatement ps = connection.prepareStatement(uploadProductQuery);
+            products.stream().forEach(p -> {
+                try {
+                    ps.setString(1, p.getId());
+                    ps.setString(2, p.getName());
+                    ps.setDouble(3, p.getImportPrice());
+                    ps.setDouble(4, p.getExportPrice());
+                    ps.setDouble(5, p.getProfit());
+                    ps.setString(6, p.getDescription());
+                    ps.setBoolean(7, p.isStatus());
+                    ps.setInt(8, p.getCategoryId());
+                    ps.setInt(9, p.getQuantity());
+                } catch (SQLException se) {
+                    se.getStackTrace();
+                }
+            });
+            int result = ps.executeUpdate();
+            if (result > 0) {
+                PrintForm.success("Upload " + result + " records to database success");
+                productIOService.writeToFile(products, getPath());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            MySQLConnect.close(connection);
+        }
     }
 
 }

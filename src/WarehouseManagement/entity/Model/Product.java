@@ -139,6 +139,7 @@ public class Product implements IProduct, Serializable {
     }
 
     public void setCategoryId(int categoryId) throws ProductException{
+        CategoryServiceImpl categoryService = CategoryServiceImpl.getCategoryServiceInstance();
         List<Category> categories = CategoryServiceImpl.getCategories();
         Category category = categories.stream().filter(c -> c.getId() == categoryId)
                                                     .findFirst()

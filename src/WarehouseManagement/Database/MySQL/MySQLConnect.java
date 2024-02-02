@@ -14,8 +14,6 @@ public class MySQLConnect {
             String password = "Vtt$88842648864";
             Connection connection = DriverManager.getConnection(url,user,password);//connect tới database sử dụng
             PrintForm.success("Kết nối thành công");
-            if (connection == null)
-                System.out.println("connection null");
             return connection;
         } catch (Exception ex){
             ex.printStackTrace();
